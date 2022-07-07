@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerGrid : MonoBehaviour
 {
@@ -19,13 +20,19 @@ public class PlayerGrid : MonoBehaviour
 
     #endregion
 
-    public UnitController Wiz1;
-    public UnitController Wiz2;
+    public GameObject fieldUnits;
 
     private void Start()
 	{
-        GridArray[3, 4] = Wiz1;
-        GridArray[3, 3] = Wiz2;
+        UnitController[] temp = fieldUnits.GetComponentsInChildren<UnitController>();
+
+        foreach (UnitController u in temp)
+		{
+            GridArray[u.startingRow, u.startingColumn] = u;
+            u.transform.DOMove(
+                new Vector3(rows[u.startingRow].position.y, cols[u.startingColumn].position.x, 0), 0
+                );
+		}
     }
 
 	//should be used after any movement/swap/fusion

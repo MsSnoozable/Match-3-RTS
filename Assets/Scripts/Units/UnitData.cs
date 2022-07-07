@@ -10,6 +10,12 @@ public abstract class UnitData : ScriptableObject
     public int xPos = 0;
     public int yPos;
 	public GameObject model;
+    public enum unitColors
+	{
+		Red, Green, Blue
+	}
+	public unitColors color;
+
 	#region Private Fields
 	#endregion
 	//color enumerator

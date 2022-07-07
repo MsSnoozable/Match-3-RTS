@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class CursorScript : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class CursorScript : MonoBehaviour
     #region Private Fields
     int xPos = 0;
     int yPos = 0;
-	#endregion
 	Direction currentDirection;
+	#endregion
 
 	private void Update()
 	{
@@ -27,6 +28,10 @@ public class CursorScript : MonoBehaviour
 		currentDirection = Direction.Down;
 	}
 		
+	void test (InputAction.CallbackContext contxt)
+	{
+
+	}
 	void Rotation ()
 	{
 		//changes direction of cursor
@@ -75,27 +80,33 @@ public class CursorScript : MonoBehaviour
 			secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
 		}
 	}
-
+	
 	private void Movement()
 	{
-		//TODO: restrict movement based on direction of secondary selection
-		if (Input.GetKeyDown("d") && xPos < PlayerGrid.GridWidth - 1)
-		{
-			transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
-		}
-		else if (Input.GetKeyDown("a") && xPos > 0)
-		{
-			transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
-		}
-		else if (Input.GetKeyDown("s") && yPos < PlayerGrid.GridHeight - 1)
-		{
-			transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
-		}
-		else if (Input.GetKeyDown("w") && yPos > 0)
+		if (Input.GetKeyDown("w") &&
+			yPos > 0 + directionCheck(Direction.Up))
 		{
 			transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
 		}
+		else if (Input.GetAxis("Horizontal") < 0 &&
+		   xPos > 0 + directionCheck(Direction.Left))
+		{
+			transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
+		}
+		else if (Input.GetKeyDown("s") &&
+			yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
+		{
+			transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
+		}
+		else if (Input.GetKeyDown("d") && 
+			xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
+		{
+			transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
+		}
 	}
 
-
+	private int directionCheck(Direction direction)
+	{
+		return (currentDirection == direction) ? 1 : 0;
+	}
 }

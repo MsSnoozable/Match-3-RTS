@@ -6,7 +6,6 @@ using UnityEngine;
 public class SmallUnitData : UnitData
 {
     #region Public Fields
-    public int color;
     #endregion
 
     #region Private Fields

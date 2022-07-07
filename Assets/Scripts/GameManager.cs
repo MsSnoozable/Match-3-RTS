@@ -4,25 +4,16 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    #region Public Fields
-    //
-    #endregion
+    public PlayerStats P1;
+    public PlayerStats P2;
 
-    #region Private Fields
-    #endregion
-
-    //chain multiplier scaling values
-    //P1 Health
-    //P1 Score
-    //P1 mana
-    //P1 character
-    //p1 ability
-
-    public float mana;
-
-
-	public class P1_Stats
+	private void Start()
 	{
-        public float mana;
+	    
+	}
+
+	private void Update()
+	{
+		
 	}
 }
