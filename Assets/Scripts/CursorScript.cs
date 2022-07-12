@@ -9,6 +9,7 @@ public class CursorScript : MonoBehaviour
 	#region Public Fields
     public float moveDuration = 0;
     public PlayerGrid pg;
+	public PlayerInput playerInput;
     #endregion
 
     #region Private Fields
@@ -17,22 +18,48 @@ public class CursorScript : MonoBehaviour
 	Direction currentDirection;
 	#endregion
 
+	#region MonoBehavriour
 	private void Update()
 	{
-		Movement();
+		/*Movement();
 		Rotation();
-		Swapping();
+		Swapping();*/
 	}
 	private void Start()
 	{
 		currentDirection = Direction.Down;
+
+		playerInput.onControlsChanged += PlayerInput_onControlsChanged;
+		playerInput.onDeviceLost += PlayerInput_onDeviceLost;
+		playerInput.onDeviceRegained += PlayerInput_onDeviceRegained;
+
 	}
-		
+
+	#region Not Used RN
+	private void PlayerInput_onDeviceRegained(PlayerInput obj)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	private void PlayerInput_onDeviceLost(PlayerInput obj)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	private void PlayerInput_onControlsChanged(PlayerInput obj)
+	{
+		throw new System.NotImplementedException();
+	}
+	#endregion
+
+	#endregion
+
 	void test (InputAction.CallbackContext contxt)
 	{
 
 	}
-	void Rotation ()
+	
+	/*void Rotation ()
 	{
 		//changes direction of cursor
 		if (Input.GetKeyDown("z") )
@@ -54,11 +81,11 @@ public class CursorScript : MonoBehaviour
 			}
 			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration);
 		}
-	}
+	}*/
 
-	void Swapping ()
+	public void Swapping (InputAction.CallbackContext context)
 	{
-		if (Input.GetKeyDown("x"))
+		if (context.performed)
 		{
 			UnitController unit = pg.GridArray[xPos, yPos];
 			UnitController secondaryUnit = null;
@@ -81,27 +108,53 @@ public class CursorScript : MonoBehaviour
 		}
 	}
 	
-	private void Movement()
+	public void Movement(InputAction.CallbackContext context)
 	{
-		if (Input.GetKeyDown("w") &&
-			yPos > 0 + directionCheck(Direction.Up))
+		if (context.performed)
 		{
-			transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
-		}
-		else if (Input.GetAxis("Horizontal") < 0 &&
-		   xPos > 0 + directionCheck(Direction.Left))
-		{
-			transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
-		}
-		else if (Input.GetKeyDown("s") &&
-			yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
-		{
-			transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
-		}
-		else if (Input.GetKeyDown("d") && 
-			xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
-		{
-			transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
+			print(yPos);
+			Vector2 moveDirection = context.ReadValue<Vector2>();
+
+			if (yPos > 0 + directionCheck(Direction.Up))
+			{
+				transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
+			}
+			else if (yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
+			{
+				transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
+			}
+			/*
+			else if (xPos > 0 + directionCheck(Direction.Left))
+			{
+				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
+			}
+			
+			else if (xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
+			{
+				transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
+			}*/
+
+
+			/*if (Input.GetKeyDown("w") &&
+				yPos > 0 + directionCheck(Direction.Up))
+			{
+				transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
+			}
+			else if (Input.GetAxis("Horizontal") < 0 &&
+			   xPos > 0 + directionCheck(Direction.Left))
+			{
+				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
+			}
+			else if (Input.GetKeyDown("s") &&
+				yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
+			{
+				transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
+			}
+			else if (Input.GetKeyDown("d") &&
+				xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
+			{
+				transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
+			}*/
 		}
 	}
 
@@ -109,4 +162,5 @@ public class CursorScript : MonoBehaviour
 	{
 		return (currentDirection == direction) ? 1 : 0;
 	}
+	
 }

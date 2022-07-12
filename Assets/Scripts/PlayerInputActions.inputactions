@@ -28,13 +28,21 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Movement",
+                    "type": "Button",
+                    "id": "97f2abb3-e246-4e10-bded-f732461bf948",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
                 {
                     "name": "",
                     "id": "f503adf6-35ad-4c14-8a01-bf6d91401638",
-                    "path": "<Keyboard>/x",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -43,20 +51,64 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "691f3708-3cd6-4040-b75c-efc19f66d6a0",
-                    "path": "",
+                    "name": "2D Vector",
+                    "id": "aa0725bc-eac2-41d1-9952-58dbf6d3e1a7",
+                    "path": "2DVector",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap",
-                    "isComposite": false,
+                    "action": "Movement",
+                    "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "up",
+                    "id": "d5282527-865f-4507-9246-b8701e424453",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "ad0b9c90-9163-4c75-8a57-86ab2063887a",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "1f7ba600-d147-452e-85f5-ebe854e40f83",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "3efc7616-8563-4444-9eed-42c75e5076d0",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
-                    "id": "0dfdce8d-c26a-42ee-ae5d-55bb19f67ebf",
-                    "path": "",
+                    "id": "cc2869b4-882f-4e5e-8d53-b7656b6989e2",
+                    "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -66,8 +118,8 @@
                 },
                 {
                     "name": "",
-                    "id": "fa22e5c2-f9d5-42f6-84b7-73ca036fa507",
-                    "path": "",
+                    "id": "64c6f978-6da5-4bac-a36a-aca60f941cbb",
+                    "path": "<Keyboard>/comma",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
