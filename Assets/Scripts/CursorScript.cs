@@ -59,10 +59,10 @@ public class CursorScript : MonoBehaviour
 
 	}
 	
-	/*void Rotation ()
+	public void Rotation (InputAction.CallbackContext context)
 	{
 		//changes direction of cursor
-		if (Input.GetKeyDown("z") )
+		if (context.started)
 		{
 			switch (currentDirection)
 			{
@@ -81,7 +81,11 @@ public class CursorScript : MonoBehaviour
 			}
 			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration);
 		}
-	}*/
+        else if (context.performed)
+        {
+			print("test");
+        }
+    }
 
 	public void Swapping (InputAction.CallbackContext context)
 	{
@@ -158,9 +162,6 @@ public class CursorScript : MonoBehaviour
 		}
 	}
 
-	private int directionCheck(Direction direction)
-	{
-		return (currentDirection == direction) ? 1 : 0;
-	}
+	private int directionCheck(Direction direction) => currentDirection == direction ? 1 : 0;
 	
 }
