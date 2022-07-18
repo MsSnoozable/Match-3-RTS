@@ -11,7 +11,8 @@
                     "id": "572e0462-8ffd-4b99-b96b-67c72a7cc38d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Rotate Left",
@@ -19,7 +20,8 @@
                     "id": "b590f4b7-12b9-42e1-bb00-0fc1840b4f46",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Hold",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Rotate Right",
@@ -27,7 +29,8 @@
                     "id": "aa95a575-8996-4976-83dc-f350a910135f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Movement",
@@ -35,7 +38,8 @@
                     "id": "97f2abb3-e246-4e10-bded-f732461bf948",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -139,7 +143,8 @@
                     "id": "ec720528-e555-4b07-a593-8c688ebcce88",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
