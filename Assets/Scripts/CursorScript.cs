@@ -61,7 +61,6 @@ public class CursorScript : MonoBehaviour
 	
 	public void Rotation (InputAction.CallbackContext context)
 	{
-		//changes direction of cursor
 		if (context.started)
 		{
 			switch (currentDirection)
@@ -81,11 +80,11 @@ public class CursorScript : MonoBehaviour
 			}
 			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration);
 		}
-        else if (context.performed)
-        {
-			print("test");
-        }
+		//else if (context.)
+		print(context);
+
     }
+
 
 	public void Swapping (InputAction.CallbackContext context)
 	{
@@ -116,7 +115,6 @@ public class CursorScript : MonoBehaviour
 	{
 		if (context.performed)
 		{
-			print(yPos);
 			Vector2 moveDirection = context.ReadValue<Vector2>();
 
 			if (yPos > 0 + directionCheck(Direction.Up))
@@ -127,12 +125,13 @@ public class CursorScript : MonoBehaviour
 			{
 				transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
 			}
+			print(context);
 			/*
 			else if (xPos > 0 + directionCheck(Direction.Left))
 			{
 				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
 			}
-			
+
 			else if (xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
 			{
 				transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
@@ -145,7 +144,7 @@ public class CursorScript : MonoBehaviour
 				transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
 			}
 			else if (Input.GetAxis("Horizontal") < 0 &&
-			   xPos > 0 + directionCheck(Direction.Left))
+				xPos > 0 + directionCheck(Direction.Left))
 			{
 				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
 			}
@@ -161,7 +160,6 @@ public class CursorScript : MonoBehaviour
 			}*/
 		}
 	}
-
 	private int directionCheck(Direction direction) => currentDirection == direction ? 1 : 0;
 	
 }
