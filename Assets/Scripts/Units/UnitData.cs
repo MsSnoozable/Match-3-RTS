@@ -15,21 +15,35 @@ public abstract class UnitData : ScriptableObject
 		Red, Green, Blue
 	}
 	public unitColors color;
+	public enum unitType
+	{
+		Wizard, Brawler, Warlock, Shaman
+	}
+	public unitType type;
 
 	#region Private Fields
 	#endregion
 	//color enumerator
-	//base damage
-	//base defence
-	//charge time
-	//sprite
+	float baseDamage;
+	float baseDefence;
+	float chargeTime;
+	Sprite sprite;
 	//sfx
 	//animations
 
 	//functions
-	//attack
-	//shield/wall
+	public abstract void Attack();
+	public abstract void Shield();
 	//move to pos
-	//
 
+	//todo: might need modifications for this based on how its implemented
+	public static bool operator == (UnitData a, UnitData b)
+	{
+		return a.color == b.color && a.type == b.type;
+	}
+
+	public static bool operator != (UnitData a, UnitData b)
+	{
+		return a.color != b.color && a.type != b.type;
+	}
 }

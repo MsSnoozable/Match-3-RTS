@@ -21,18 +21,29 @@ public class PlayerGrid : MonoBehaviour
     #endregion
 
     public GameObject fieldUnits;
+    public GameObject UnitW;
 
     private void Start()
 	{
-        UnitController[] temp = fieldUnits.GetComponentsInChildren<UnitController>();
+        /*        UnitController[] temp = fieldUnits.GetComponentsInChildren<UnitController>();
 
-        foreach (UnitController u in temp)
-		{
-            GridArray[u.startingRow, u.startingColumn] = u;
-            u.transform.DOMove(
-                new Vector3(rows[u.startingRow].position.y, cols[u.startingColumn].position.x, 0), 0
-                );
-		}
+                foreach (UnitController u in temp)
+                {
+                    GridArray[u.startingRow, u.startingColumn] = u;
+                    u.transform.DOMove(
+                        new Vector3(rows[u.startingRow].position.y, cols[u.startingColumn].position.x, 0), 0
+                        );
+                }*/
+        for (int i = 0; i < GridWidth; i++)
+        {
+            for (int j = 0; j < GridHeight; j++)
+            {
+                GameObject temp = Instantiate(UnitW, fieldUnits.transform);
+                UnitController uc = temp.GetComponent<UnitController>();
+                //uc.pg.cols[i] = uc;
+                uc.Move(i, j);
+            }
+        }
     }
 
 	//should be used after any movement/swap/fusion

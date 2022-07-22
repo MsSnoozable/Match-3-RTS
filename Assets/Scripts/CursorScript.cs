@@ -7,84 +7,80 @@ using UnityEngine.InputSystem;
 public class CursorScript : MonoBehaviour
 {
 	#region Public Fields
-    public float moveDuration = 0;
-    public PlayerGrid pg;
+	public float moveDuration = 0;
+	public PlayerGrid pg;
 	public PlayerInput playerInput;
-    #endregion
+	#endregion
 
-    #region Private Fields
-    int xPos = 0;
-    int yPos = 0;
+	#region Private Fields
+	int xPos = 0;
+	int yPos = 0;
 	Direction currentDirection;
+	//bool isHoldingMove = false;
 	#endregion
 
 	#region MonoBehavriour
-	private void Update()
-	{
-		/*Movement();
-		Rotation();
-		Swapping();*/
-	}
 	private void Start()
 	{
 		currentDirection = Direction.Down;
-
-		playerInput.onControlsChanged += PlayerInput_onControlsChanged;
-		playerInput.onDeviceLost += PlayerInput_onDeviceLost;
-		playerInput.onDeviceRegained += PlayerInput_onDeviceRegained;
-
-	}
-
-	#region Not Used RN
-	private void PlayerInput_onDeviceRegained(PlayerInput obj)
-	{
-		throw new System.NotImplementedException();
-	}
-
-	private void PlayerInput_onDeviceLost(PlayerInput obj)
-	{
-		throw new System.NotImplementedException();
-	}
-
-	private void PlayerInput_onControlsChanged(PlayerInput obj)
-	{
-		throw new System.NotImplementedException();
 	}
 	#endregion
 
-	#endregion
-
-	void test (InputAction.CallbackContext contxt)
+	public void RotateLeft(InputAction.CallbackContext context)
 	{
-
-	}
-	
-	public void Rotation (InputAction.CallbackContext context)
-	{
+		//todo: repeat ramp speed on hold
 		if (context.started)
 		{
 			switch (currentDirection)
 			{
 				case Direction.Down:
 					currentDirection = Direction.Right;
+					if (xPos == PlayerGrid.GridWidth - 1) Move(Vector2.left);
 					break;
 				case Direction.Right:
 					currentDirection = Direction.Up;
+					if (yPos == 0) Move(Vector2.down);
 					break;
 				case Direction.Up:
 					currentDirection = Direction.Left;
+					if (xPos == 0) Move(Vector2.right);
 					break;
 				case Direction.Left:
 					currentDirection = Direction.Down;
+					if (yPos == PlayerGrid.GridHeight - 1) Move(Vector2.up);
 					break;
 			}
-			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration);
+			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration).SetEase(Ease.OutCirc);
 		}
-		//else if (context.)
-		print(context);
-
     }
 
+	public void RotateRight(InputAction.CallbackContext context)
+	{
+		//todo: repeat ramp speed on hold
+		if (context.started)
+		{
+			switch (currentDirection)
+			{
+				case Direction.Down:
+					currentDirection = Direction.Left;
+					if (xPos == 0) Move(Vector2.right);
+					break;
+				case Direction.Left:
+					currentDirection = Direction.Up;
+					if (yPos == 0) Move(Vector2.down);
+					break;
+				case Direction.Up:
+					currentDirection = Direction.Right;
+					if (xPos == PlayerGrid.GridWidth - 1) Move(Vector2.left);
+					break;
+				case Direction.Right:
+					currentDirection = Direction.Down;
+					if (yPos == PlayerGrid.GridHeight - 1) Move(Vector2.up);
+					break;
+			}
+			transform.DORotate(new Vector3(0, 0, (float)currentDirection), moveDuration).SetEase(Ease.OutCirc);
+		}
+	}
 
 	public void Swapping (InputAction.CallbackContext context)
 	{
@@ -110,55 +106,46 @@ public class CursorScript : MonoBehaviour
 			secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
 		}
 	}
-	
-	public void Movement(InputAction.CallbackContext context)
+	void Move (Vector2 moveDirection)
 	{
-		if (context.performed)
+/*		do
+		{*/
+			xPos += Mathf.RoundToInt(moveDirection.x);
+			yPos -= Mathf.RoundToInt(moveDirection.y); //needs minus to invert
+
+			//restricts based on direction
+			int leftEdge = directionCheck(Direction.Left);
+			int topEdge = directionCheck(Direction.Up);
+			int rightEdge = PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right);
+			int bottomEdge = PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down);
+
+			xPos = Mathf.Clamp(xPos, leftEdge, rightEdge);
+			yPos = Mathf.Clamp(yPos, topEdge, bottomEdge);
+
+			transform.DOMove(new Vector2(
+				pg.cols[xPos].position.x,
+				pg.rows[yPos].position.y), moveDuration).SetEase(Ease.OutCirc);
+			
+	/*		yield return new WaitForSeconds(1f);
+
+		} while (isHoldingMove);*/
+	}
+
+	public void Move(InputAction.CallbackContext context)
+	{
+		//todo: repeat ramp speed on hold
+		if (context.started)
 		{
-			Vector2 moveDirection = context.ReadValue<Vector2>();
-
-			if (yPos > 0 + directionCheck(Direction.Up))
-			{
-				transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
-			}
-			else if (yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
-			{
-				transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
-			}
-			print(context);
-			/*
-			else if (xPos > 0 + directionCheck(Direction.Left))
-			{
-				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
-			}
-
-			else if (xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
-			{
-				transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
-			}*/
-
-
-			/*if (Input.GetKeyDown("w") &&
-				yPos > 0 + directionCheck(Direction.Up))
-			{
-				transform.DOMoveY(pg.rows[--yPos].position.y, moveDuration);
-			}
-			else if (Input.GetAxis("Horizontal") < 0 &&
-				xPos > 0 + directionCheck(Direction.Left))
-			{
-				transform.DOMoveX(pg.cols[--xPos].position.x, moveDuration);
-			}
-			else if (Input.GetKeyDown("s") &&
-				yPos < PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down))
-			{
-				transform.DOMoveY(pg.rows[++yPos].position.y, moveDuration);
-			}
-			else if (Input.GetKeyDown("d") &&
-				xPos < PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right))
-			{
-				transform.DOMoveX(pg.cols[++xPos].position.x, moveDuration);
-			}*/
+			Move(context.ReadValue<Vector2>());
 		}
+		/*else if (context.performed)
+		{
+			isHoldingMove = true;
+		}
+		else if (context.canceled)
+		{
+			isHoldingMove = false;
+		}*/
 	}
 	private int directionCheck(Direction direction) => currentDirection == direction ? 1 : 0;
 	

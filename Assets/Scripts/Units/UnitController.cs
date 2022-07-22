@@ -16,8 +16,6 @@ public class UnitController : MonoBehaviour
     #region Private Fields
 
     [SerializeField] float moveDuration;
-    public int startingColumn = 0;
-    public int startingRow = 0;
     
     //References
     Animator anim;
@@ -30,8 +28,6 @@ public class UnitController : MonoBehaviour
     {
         anim = this.GetComponent<Animator>();
         anim.SetTrigger("idle");
-        transform.DOMoveY(pg.rows[startingRow].position.y, moveDuration);
-        transform.DOMoveX(pg.cols[startingColumn].position.x, moveDuration);
     }
 
     public UnitController Move(int xDestination, int yDestination)
