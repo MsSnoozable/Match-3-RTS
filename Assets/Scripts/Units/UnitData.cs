@@ -7,18 +7,10 @@ public abstract class UnitData : ScriptableObject
 {
     #region Public Fields
     #endregion
-    public int xPos = 0;
-    public int yPos;
 	public GameObject model;
-    public enum unitColors
-	{
-		Red, Green, Blue
-	}
+
 	public unitColors color;
-	public enum unitType
-	{
-		Wizard, Brawler, Warlock, Shaman
-	}
+
 	public unitType type;
 
 	#region Private Fields
@@ -37,13 +29,7 @@ public abstract class UnitData : ScriptableObject
 	//move to pos
 
 	//todo: might need modifications for this based on how its implemented
-	public static bool operator == (UnitData a, UnitData b)
-	{
-		return a.color == b.color && a.type == b.type;
-	}
+	public static bool operator == (UnitData a, UnitData b) => a.color == b.color && a.type == b.type;
 
-	public static bool operator != (UnitData a, UnitData b)
-	{
-		return a.color != b.color && a.type != b.type;
-	}
+	public static bool operator != (UnitData a, UnitData b) => a.color != b.color || a.type != b.type;
 }

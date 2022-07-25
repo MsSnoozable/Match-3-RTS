@@ -104,6 +104,13 @@ public class CursorScript : MonoBehaviour
 					break;
 			}
 			secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
+
+			UnitData u1 = unit.GetComponent<UnitController>().unit;
+			UnitData u2 = secondaryUnit.GetComponent<UnitController>().unit;
+			if (u1 == u2)
+			{
+				u1.Attack();
+			}
 		}
 	}
 	void Move (Vector2 moveDirection)

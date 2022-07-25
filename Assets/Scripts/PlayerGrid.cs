@@ -22,10 +22,11 @@ public class PlayerGrid : MonoBehaviour
 
     public GameObject fieldUnits;
     public GameObject UnitW;
+    public GameObject UnitC;
 
     private void Start()
 	{
-        /*        UnitController[] temp = fieldUnits.GetComponentsInChildren<UnitController>();
+		/*        UnitController[] temp = fieldUnits.GetComponentsInChildren<UnitController>();
 
                 foreach (UnitController u in temp)
                 {
@@ -34,17 +35,24 @@ public class PlayerGrid : MonoBehaviour
                         new Vector3(rows[u.startingRow].position.y, cols[u.startingColumn].position.x, 0), 0
                         );
                 }*/
-        for (int i = 0; i < GridWidth; i++)
-        {
-            for (int j = 0; j < GridHeight; j++)
-            {
-                GameObject temp = Instantiate(UnitW, fieldUnits.transform);
-                UnitController uc = temp.GetComponent<UnitController>();
-                //uc.pg.cols[i] = uc;
-                uc.Move(i, j);
-            }
-        }
-    }
+		InitSpawnUnits();
+	}
+
+	private void InitSpawnUnits()
+	{
+		for (int i = 0; i < GridWidth; i++)
+		{
+			for (int j = 0; j < GridHeight; j++)
+			{
+				float r = Random.value;
+				GameObject chosen = r < 0.5 ? UnitC : UnitW;
+				GameObject temp = Instantiate(chosen, fieldUnits.transform);
+				UnitController uc = temp.GetComponent<UnitController>();
+				uc.pg = this;
+				uc.Move(i, j);
+			}
+		}
+	}
 
 	//should be used after any movement/swap/fusion
 	//if the match was done from a swap it doesn't add to chain value
