@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStats
+[CreateAssetMenu(fileName = "PlayerStats", menuName = "Leader")]
+public class PlayerStats : ScriptableObject
 {
     #region Public Fields
     #endregion
@@ -14,6 +15,7 @@ public class PlayerStats
     //P1 Score
     //P1 character
     //p1 ability
+    public string characterName;
 
     public int health;
     public float mana;

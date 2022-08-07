@@ -1142,7 +1142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a902fd79ff265a44bc5128f28ebc62e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDuration: 0.25
+  moveDuration: 0.15
   pg: {fileID: 1478873809}
   playerInput: {fileID: 233190278}
 --- !u!114 &233190278
@@ -1238,7 +1238,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 233190277}
         m_TargetAssemblyTypeName: CursorScript, Assembly-CSharp
-        m_MethodName: Move
+        m_MethodName: MoveHorizontal
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1248,8 +1248,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 97f2abb3-e246-4e10-bded-f732461bf948
-    m_ActionName: In Game Cursor/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+    m_ActionId: b0e88589-1fb0-43a2-be7c-ac337e367dbf
+    m_ActionName: In Game Cursor/Move Horizontal[/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 233190277}
+        m_TargetAssemblyTypeName: CursorScript, Assembly-CSharp
+        m_MethodName: MoveVertical
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b427f712-e47a-4a29-940a-db5b85af7ff5
+    m_ActionName: In Game Cursor/Move Vertical[/Keyboard/s,/Keyboard/w]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: In Game Cursor
@@ -1617,7 +1633,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311944179}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.54, y: 3.34, z: 0}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2297,6 +2313,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d78e83e7de18141b37dfaa2de5bd9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  P1: {fileID: 0}
+  P2: {fileID: 0}
+  isSetupComplete: 0
 --- !u!4 &535839924
 Transform:
   m_ObjectHideFlags: 0
@@ -3226,7 +3245,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 695150234}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.97, y: 2.37, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5253,7 +5272,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1351593854}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.3798501, y: 3.0849948, z: -1.8885943}
+  m_LocalPosition: {x: -8.97, y: 3.56, z: -1.8885943}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5837,7 +5856,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1478873807}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.74, y: 0.39, z: -1.8394852}
+  m_LocalPosition: {x: -9.01, y: 4.96, z: -1.8394852}
   m_LocalScale: {x: 1.2251856, y: 1.2251856, z: 1.2251856}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5874,9 +5893,10 @@ MonoBehaviour:
   - {fileID: 286747278}
   - {fileID: 805246799}
   - {fileID: 344599043}
-  fieldUnits: {fileID: 1351593854}
-  UnitW: {fileID: 4105362945620786469, guid: ebea5f8b8163f9a4ab9d9a1b45444e28, type: 3}
-  UnitC: {fileID: 9178090177391721229, guid: 037845a52a053c14e90209ee8f80e06c, type: 3}
+  fieldUnits: {fileID: 1351593855}
+  UnitA: {fileID: 4105362945620786469, guid: ebea5f8b8163f9a4ab9d9a1b45444e28, type: 3}
+  UnitB: {fileID: 9178090177391721229, guid: 037845a52a053c14e90209ee8f80e06c, type: 3}
+  UnitC: {fileID: 2053518115102101880, guid: 521aebf732701414da1c25c63cb8390b, type: 3}
 --- !u!1 &1482416441
 GameObject:
   m_ObjectHideFlags: 0
@@ -6227,7 +6247,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
