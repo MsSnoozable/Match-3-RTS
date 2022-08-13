@@ -98,8 +98,8 @@ public abstract class CursorScript : MonoBehaviour
 		xPos += Mathf.RoundToInt(moveDirection.x);
 		yPos -= Mathf.RoundToInt(moveDirection.y); //needs minus to invert
 
-		xPos = Mathf.Clamp(xPos, 0, PlayerGrid.GridWidth);
-		yPos = Mathf.Clamp(yPos, 0, PlayerGrid.GridHeight);
+		xPos = Mathf.Clamp(xPos, PlayerGrid.MinColumn, PlayerGrid.GridWidth);
+		yPos = Mathf.Clamp(yPos, PlayerGrid.MinColumn, PlayerGrid.GridHeight);
 
 		transform.DOMove(new Vector2(
 			pg.cols[xPos].position.x,

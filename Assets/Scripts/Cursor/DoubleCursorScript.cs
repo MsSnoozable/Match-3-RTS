@@ -45,7 +45,7 @@ public class DoubleCursorScript : CursorScript
 				case Direction.Up:
 					currentDirection = Direction.Left;
 					secondaryCursorMove = Vector3.left;
-					if (xPos == 0) Move(Vector2.right);
+					if (xPos == PlayerGrid.MinColumn) Move(Vector2.right);
 					break;
 				case Direction.Left:
 					currentDirection = Direction.Down;
@@ -68,7 +68,7 @@ public class DoubleCursorScript : CursorScript
 				case Direction.Down:
 					currentDirection = Direction.Left;
 					secondaryCursorMove = Vector3.left;
-					if (xPos == 0) Move(Vector2.right);
+					if (xPos == PlayerGrid.MinColumn) Move(Vector2.right);
 					break;
 				case Direction.Left:
 					currentDirection = Direction.Up;
@@ -120,8 +120,16 @@ public class DoubleCursorScript : CursorScript
 				//print("Match was " + (thing ? "made succesffuly!!!" : "not made... you suck"));
 			}*/
 
-			StartCoroutine(unit.MatchCheck(unit.xPos, unit.yPos));
-			StartCoroutine(secondaryUnit.MatchCheck(secondaryUnit.xPos, secondaryUnit.yPos));
+
+			//todo: fuse these into one by passing in a list of uc
+
+			List<UnitController> swapped = new List<UnitController>();
+			swapped.Add(unit);
+			swapped.Add(secondaryUnit);
+
+			//StartCoroutine(unit.MatchCheck(unit.xPos, unit.yPos));
+			//StartCoroutine(secondaryUnit.MatchCheck(secondaryUnit.xPos, secondaryUnit.yPos));
+
 		}
 	}
 
@@ -133,7 +141,7 @@ public class DoubleCursorScript : CursorScript
 		yPos -= Mathf.RoundToInt(moveDirection.y); //needs minus to invert
 
 		//restricts based on direction
-		int leftEdge = directionCheck(Direction.Left);
+		int leftEdge = directionCheck(Direction.Left) + 1;
 		int topEdge = directionCheck(Direction.Up);
 		int rightEdge = PlayerGrid.GridWidth - 1 - directionCheck(Direction.Right);
 		int bottomEdge = PlayerGrid.GridHeight - 1 - directionCheck(Direction.Down);

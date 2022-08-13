@@ -10,13 +10,12 @@ public class PlayerGrid : MonoBehaviour
 {
     #region Public Fields
 
-    public Transform[] rows = new Transform[GridWidth];
-    public Transform[] cols = new Transform[GridHeight];
-    public Transform[] queueTransforms = new Transform[GridHeight];
-    [HideInInspector] public const byte GridWidth = 7;
-    [HideInInspector] public const byte GridHeight = 7;
+    public Transform[] rows = new Transform[GridHeight];
+    public Transform[] cols = new Transform[GridWidth];
+    [HideInInspector] public const int GridWidth = 8;
+    [HideInInspector] public const int GridHeight = 7;
+    [HideInInspector] public const int MinColumn = 1;
     public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
-    [HideInInspector] public UnitController[] Queue = new UnitController[GridHeight];
 
     #endregion
 
@@ -55,23 +54,22 @@ public class PlayerGrid : MonoBehaviour
     {
         foreach (UnitController uc in GridArray)
 		{
-            Destroy(uc.gameObject);
+            if (uc != null)
+                Destroy(uc.gameObject);
 		}
         InitSpawnUnits();
 	}
 
 	public void MoveRowMulti(int topRow, int bottomRow, int pulledFrom, int destination)
 	{
-
-        for (int i = topRow; i <= bottomRow; i++)
-		{
-            print(string.Format("r: {0}, pulled: {1}, dest: {2}", i, pulledFrom, destination));
-
-            MoveRow(i, pulledFrom, destination);
-		}
         if (topRow == bottomRow)
 		{
             throw new System.Exception("not a multi row");
+		}
+
+        for (int i = topRow; i <= bottomRow; i++)
+		{
+            MoveRow(i, pulledFrom, destination);
 		}
 
         //if topRow == 0, bottom row == grid height -1.... then only check front column for matches
@@ -82,9 +80,9 @@ public class PlayerGrid : MonoBehaviour
 
         print(string.Format("r: {0}, pulled: {1}, dest: {2}" , row, pulledFrom, destination));
 
-		if (pulledFrom >= 0)
+		if (pulledFrom >= PlayerGrid.MinColumn)
 		{
-			for (int i = 0; i <= pulledFrom; i++)
+			for (int i = PlayerGrid.MinColumn - 1; i <= pulledFrom; i++)
 			{
 				UnitController space = GridArray[pulledFrom - i, row].Move(destination - i, row);
 			}
@@ -105,17 +103,17 @@ public class PlayerGrid : MonoBehaviour
 
 	private void InitSpawnUnits()
 	{
-        int[] firstColumn = new int[GridWidth];
+        //int[] firstColumn = new int[GridWidth];
 
         int[] lastChoice_c = new int[GridWidth];
         int[] twoAgoChoice_c = new int[GridWidth]; 
 
-        for (int col = 0; col < GridWidth; col++)
+        for (int col = 0; col < GridWidth; col++) //set to 0 to include Queue in initializing. It's easier
 		{
             int lastChoice_r = Random.Range(0, availableSmallUnits.Length);
             int twoAgoChoice_r = Random.Range(0, availableSmallUnits.Length);
 
-            if (col == 1) { firstColumn = lastChoice_c; }
+            //if (col == 1) { firstColumn = lastChoice_c; }
 
 			for (int row = 0; row < GridHeight; row++)
 			{
@@ -127,7 +125,7 @@ public class PlayerGrid : MonoBehaviour
                 do
                 {
                     rng = Random.Range(0, availableSmallUnits.Length);
-                } while ((col > 1) ? rng == twoAgoChoice_r || rng == twoAgoChoice_c[row] 
+                } while ((col > PlayerGrid.MinColumn) ? rng == twoAgoChoice_r || rng == twoAgoChoice_c[row] 
                     : rng == twoAgoChoice_r);
 
 				GameObject unit = Instantiate(availableSmallUnits[rng], fieldUnits);
@@ -145,7 +143,7 @@ public class PlayerGrid : MonoBehaviour
 			} //end row
             twoAgoChoice_c = lastChoice_c;
         } //end
-        AddToQueue(0, GridHeight - 1, firstColumn);
+        //AddToQueue(0, GridHeight - 1, firstColumn);
     }
 
     void AddToQueue (int topOfReplace, int bottomOfReplace, int[] firsColumn)
@@ -170,7 +168,6 @@ public class PlayerGrid : MonoBehaviour
 
             uc.pg = this;
             uc.gameObject.transform.position = rows[i].position;
-            Queue[i] = uc;
             //overload move with single parameter for move to queue
             //uc.Move(col, row);
 
@@ -183,7 +180,7 @@ public class PlayerGrid : MonoBehaviour
 	{
         return true;
 /*        UnitController = 
-        if (currentlyCheckedUnit > 0)
+        if (currentlyCheckedUnit > PlayerGrid.MinColumn)
 		{
             return MatchCheck(something - 1);
 		}
