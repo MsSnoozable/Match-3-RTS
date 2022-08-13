@@ -7,5 +7,5 @@ AnimatorOverrideController:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Warrior Animation
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9191a08a904a2494ba488b9f291538da, type: 2}
   m_Clips: []

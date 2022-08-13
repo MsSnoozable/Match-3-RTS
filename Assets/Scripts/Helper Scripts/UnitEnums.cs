@@ -6,3 +6,8 @@ public enum unitColors
 {
 	Red, Green, Blue
 }
+
+public enum unitRange
+{
+	Melee, Ranged, Seige
+}

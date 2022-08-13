@@ -1,0 +1,34 @@
+{
+    "name": "Dev Tools",
+    "maps": [
+        {
+            "name": "Main",
+            "id": "dc24ae4d-8472-4b10-8324-ac7a59fc4d9d",
+            "actions": [
+                {
+                    "name": "Reset Board",
+                    "type": "Button",
+                    "id": "8867ac51-ca7f-4f56-bcaf-a9cf454d2c5e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6b77c563-c81b-4fab-8df2-0344336798a8",
+                    "path": "<Keyboard>/f1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Reset Board",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

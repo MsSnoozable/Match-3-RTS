@@ -9,6 +9,7 @@ public abstract class UnitData : ScriptableObject
 	public GameObject model;
 	public unitColors color;
 	public unitType type;
+	public unitRange range;
 	public static float moveDuration = 0.5f;
 
     #endregion
