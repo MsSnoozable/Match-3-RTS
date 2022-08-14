@@ -92,44 +92,9 @@ public class DoubleCursorScript : CursorScript
 
 	public override void Swapping(InputAction.CallbackContext context)
 	{
-		if (context.performed)
+		if (context.started)
 		{
-			UnitController unit = pg.GridArray[xPos, yPos];
-			UnitController secondaryUnit = null;
-			switch (currentDirection)
-			{
-				case Direction.Down:
-					secondaryUnit = unit.Move(xPos, yPos + 1);
-					break;
-				case Direction.Right:
-					secondaryUnit = unit.Move(xPos + 1, yPos);
-					break;
-				case Direction.Up:
-					secondaryUnit = unit.Move(xPos, yPos - 1);
-					break;
-				case Direction.Left:
-					secondaryUnit = unit.Move(xPos - 1, yPos);
-					break;
-			}
-			secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
-
-			/*if (gameManager.isSetupComplete)
-			{
-				//if (!fromSwap)
-				bool thing = MatchCheck(xDestination, yDestination);
-				//print("Match was " + (thing ? "made succesffuly!!!" : "not made... you suck"));
-			}*/
-
-
-			//todo: fuse these into one by passing in a list of uc
-
-			List<UnitController> swapped = new List<UnitController>();
-			swapped.Add(unit);
-			swapped.Add(secondaryUnit);
-
-			//StartCoroutine(unit.MatchCheck(unit.xPos, unit.yPos));
-			//StartCoroutine(secondaryUnit.MatchCheck(secondaryUnit.xPos, secondaryUnit.yPos));
-
+			GameManager.instance.DoubleCursorSwap(xPos, yPos, currentDirection);
 		}
 	}
 

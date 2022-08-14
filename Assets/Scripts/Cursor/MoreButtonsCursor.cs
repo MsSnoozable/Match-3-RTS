@@ -19,6 +19,8 @@ public class MoreButtonsCursor : CursorScript
     }
     public override void Swapping(InputAction.CallbackContext context)
     {
+        //2d vector with read value for each swap direction
+
         throw new System.NotImplementedException();
 
     }
@@ -38,4 +40,6 @@ public class MoreButtonsCursor : CursorScript
     {
 
     }
+
+
 }

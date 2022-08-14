@@ -1,0 +1,17 @@
+{
+    "name": "Cursor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7bda95c06c71c80409c8a0e7f22dd122",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
