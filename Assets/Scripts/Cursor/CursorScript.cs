@@ -47,7 +47,7 @@ public abstract class CursorScript : MonoBehaviour
 		{
 			HoriMove = MoveFromHoldInput(moveDirection);
 			StartCoroutine(HoriMove);
-			//todo: trying to fix overlap 1d axis bug
+			//broken: trying to fix overlap 1d axis bug
 			/*if (currentHoriDirection != moveDirection)
 			{
 				StopCoroutine(HoriMove);

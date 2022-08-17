@@ -15,20 +15,16 @@ public class PlayerGrid : MonoBehaviour
     [HideInInspector] public const int GridWidth = 8;
     [HideInInspector] public const int GridHeight = 7;
     [HideInInspector] public const int MinColumn = 1;
-    public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
-    [SerializeField] GameObject[] availableSmallUnits = new GameObject[5];
+	public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
+    //todo: numOfSmallUnits goes to this, but added dynammically?
+	[SerializeField] GameObject[] availableSmallUnits = new GameObject[5];
 
     #endregion
 
     #region Private Fields
 
-    [SerializeField] Transform fieldUnits;
-
-
     int numOfSmallUnits;
-
-
-    List<UnitController> successfulMatches;
+    //note: maybe needed? //List<UnitController> successfulMatches;
 
     #endregion
 
@@ -46,7 +42,7 @@ public class PlayerGrid : MonoBehaviour
 		InitSpawnUnits();
         
         GameObject cursor = Instantiate(GameManager.instance.GetCursor(this.gameObject.tag), transform);
-        //todo: could add pg in cursor here for cleaner observer pattern
+        //optimization: could add pg in cursor here for cleaner observer pattern
 
         GameManager.instance.onDoubleCursorSwap += Swap;
 
@@ -86,7 +82,7 @@ public class PlayerGrid : MonoBehaviour
             /*if (gameManager.isSetupComplete)
                 //if (!fromSwap bool thing = MatchCheck(xDestination, yDestination);*/
 
-            //todo: this match check should go somwhere else
+            //note: this match check should go somwhere else
             StartCoroutine(unit.MatchCheck(swapped));
         //}
     }
@@ -98,6 +94,8 @@ public class PlayerGrid : MonoBehaviour
             if (uc != null)
                 Destroy(uc.gameObject);
 		}
+        GameManager.instance.isSetupComplete = false;
+        StartCoroutine(GameManager.instance.Countdown());
         InitSpawnUnits();
 	}
 
@@ -112,46 +110,107 @@ public class PlayerGrid : MonoBehaviour
 
         //if topRow == 0, bottom row == grid height -1.... then only check front column for matches
 	}
-
+    //todo: might split into two types of functions
     public void MoveRow(int row, int pulledFrom, int destination)
     {
         print(string.Format("r: {0}, pulled: {1}, dest: {2}" , row, pulledFrom, destination));
 
-		if (pulledFrom >= PlayerGrid.MinColumn)
+        if (pulledFrom > destination && pulledFrom <= PlayerGrid.GridWidth - 1) //pull from right
+        {
+            for (int i = PlayerGrid.GridWidth - 1; i >= pulledFrom; i--)
+            {
+                print(i);
+                GridArray[i, row].Move(i - 1, row);
+            }
+        }
+        //optimization: super messy can be cleaned. Maybe get rid of "destination"?
+        else if (pulledFrom < destination) //pull from left/queue
+        {
+            for (int i = 0; i < destination + 1; i++)
+            {
+                if (pulledFrom - i >= 0) //in array bounds
+                {
+                    GridArray[pulledFrom - i, row].Move(destination - i, row);
+                }
+                else //pulling from queue
+                {
+                    StartCoroutine(AddToQueue(row));
+                    GridArray[0, row].Move(destination - i, row);
+                }
+            }
+        }
+        else { throw new System.Exception(string.Format("pulledFrom == destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
+
+
+        /*if (pulledFrom < PlayerGrid.GridWidth - 1)
 		{
-			for (int i = PlayerGrid.MinColumn - 1; i <= pulledFrom; i++)
-			{
-				UnitController space = GridArray[pulledFrom - i, row].Move(destination - i, row);
-			}
+		}
+        else if (pulledFrom >= PlayerGrid.GridWidth - 1)
+		{
+            //donothign?
+            print("do nothing?");
 		}
         else
 		{
-            PullFromQueue();
-		}
-		//if rightmost = -1 pull from queue before iterating
+            throw new System.Exception("out of bounds pull attempt");
+		}*/
 	}
 
-    void PullFromQueue ()
+    IEnumerator AddToQueue (int row /*int topOfReplace, int bottomOfReplace, int[] firsColumn*/)
 	{
-        Debug.LogWarning("queue");
-	}
+        int rng = 0;
+        do
+        {
+            rng = RandomUnitIndex();
+        } while (AdjacentMatches(row, rng));
 
-    void AddToQueue (int topOfReplace, int bottomOfReplace, int[] firsColumn)
-	{
-		
+        UnitController uc = CreateUnit(rng, row);
+        uc.Move(0, row);
+        yield return new WaitForSeconds(UnitData.moveDuration);
     }
 
-	private void InitSpawnUnits()
+    //qa check: don't know if this works properly right now. Might be messed up from the artifacting glitch
+    bool AdjacentMatches (int row, int attemptedIndex)
 	{
-        //int[] firstColumn = new int[GridWidth];
+        int topRow = Mathf.Clamp(row - 2, 0, PlayerGrid.GridHeight - 1);
+        int bottomRow = Mathf.Clamp(row + 2, 0, PlayerGrid.GridHeight - 1);
 
+        int verticalMatches = 0;
+        for (int i = row; i > topRow; i--)
+		{
+            if (GridArray[0, i].data.color.Equals(attemptedIndex))
+                verticalMatches++; //check top
+		}
+
+        for (int i = row; i < bottomRow; i++)
+		{
+            if (GridArray[0, i].data.color.Equals(attemptedIndex))
+                verticalMatches++; //check down
+        }
+
+        if (verticalMatches >= 3) return true;
+
+        int rightMatches = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            if (GridArray[i, row].data.color.Equals(attemptedIndex))
+                rightMatches++; //check right
+        }
+
+        if (rightMatches >= 3) return true;
+
+        return false;
+	}
+
+    private void InitSpawnUnits()
+	{
         int[] lastChoice_c = new int[GridWidth];
         int[] twoAgoChoice_c = new int[GridWidth]; 
 
         for (int col = 0; col < GridWidth; col++) //set to 0 to include Queue in initializing. It's easier
 		{
-            int lastChoice_r = Random.Range(0, availableSmallUnits.Length);
-            int twoAgoChoice_r = Random.Range(0, availableSmallUnits.Length);
+            int lastChoice_r = RandomUnitIndex();
+            int twoAgoChoice_r = RandomUnitIndex();
 
 			for (int row = 0; row < GridHeight; row++)
 			{
@@ -162,15 +221,10 @@ public class PlayerGrid : MonoBehaviour
                 int rng = 0;
                 do
                 {
-                    rng = Random.Range(0, availableSmallUnits.Length);
-                } while ((col > PlayerGrid.MinColumn) ? rng == twoAgoChoice_r || rng == twoAgoChoice_c[row] 
-                    : rng == twoAgoChoice_r);
+                    rng = RandomUnitIndex();
+                } while ((col > PlayerGrid.MinColumn) ? rng == twoAgoChoice_r || rng == twoAgoChoice_c[row] : rng == twoAgoChoice_r);
 
-				GameObject unit = Instantiate(availableSmallUnits[rng], fieldUnits);
-
-                UnitController uc = unit.GetComponent<UnitController>();
-				
-                uc.pg = this;
+                UnitController uc = CreateUnit(rng, row);
 				uc.Move(col, row);
                 //todo: make the uc add to grdiarray without move. They'll be summoned differently.
 
@@ -183,6 +237,16 @@ public class PlayerGrid : MonoBehaviour
         } //end
     }
 
+    UnitController CreateUnit (int unitIndex, int row)
+	{
+        GameObject unit = Instantiate(availableSmallUnits[unitIndex], rows[row]);
+        UnitController uc = unit.GetComponent<UnitController>();
+        uc.pg = this;
+        uc.unitIndex = unitIndex;  
+        return uc;
+    }
+
+    int RandomUnitIndex () => Random.Range(0, availableSmallUnits.Length);
 
     bool MatchCheck (Vector2 currentlyCheckedUnitPosition)
 	{

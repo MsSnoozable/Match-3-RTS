@@ -23,10 +23,9 @@ public class DoubleCursorScript : CursorScript
 		transform.position = new Vector2(pg.cols[xPos].position.x, pg.rows[yPos].position.y);
 	}
 
-
 	public void RotateLeft(InputAction.CallbackContext context)
 	{
-		//todo: repeat ramp speed on hold
+		//aesthetic: repeat ramp speed on hold
 		if (context.started)
 		{
 			Vector3 secondaryCursorMove = Vector3.zero;
@@ -59,7 +58,7 @@ public class DoubleCursorScript : CursorScript
 
 	public void RotateRight(InputAction.CallbackContext context)
 	{
-		//todo: repeat ramp speed on hold
+		//aesthetic: repeat ramp speed on hold
 		if (context.started)
 		{
 			Vector3 secondaryCursorMove = Vector3.zero;

@@ -9,7 +9,7 @@ internal enum cursorOptions {
 
 public class GameManager : MonoBehaviour
 {
-	//todo: refactor with singleton pattern... ie. static "instance"
+	//need to learn: refactor with singleton pattern... ie. static "instance"
 	public static GameManager instance;
 
 
@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
 			throw new SystemException("player number does not match avilable player count");
 	}
 	
-	IEnumerator Countdown ()
+	public IEnumerator Countdown ()
 	{
 		yield return new WaitForSeconds(3f);
 		isSetupComplete=true;
