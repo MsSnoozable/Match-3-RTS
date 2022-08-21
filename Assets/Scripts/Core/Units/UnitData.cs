@@ -19,7 +19,8 @@ public abstract class UnitData : ScriptableObject
 	#endregion
 	float baseDamage;
 	float baseDefence;
-	float chargeTime;
+	[Tooltip ("seconds from attack formation being made to the attack launching")]
+	public float chargeTime;
 	Sprite sprite;
 	//sfx
 	//animations

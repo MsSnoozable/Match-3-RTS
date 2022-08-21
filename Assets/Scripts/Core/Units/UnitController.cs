@@ -28,7 +28,6 @@ public class UnitController : MonoBehaviour
 
     public example ex;
 
-
 	private void Start()
 	{
 		
@@ -41,7 +40,12 @@ public class UnitController : MonoBehaviour
         anim.SetBool("isIdle", true);
         gameManager = FindObjectOfType<GameManager>();
     }
+    public UnitController Summon(int xDestination, int yDestination)
+	{
+        return null;
+	}
 
+    //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
     public UnitController Move(int xDestination, int yDestination)
 	{
         //if (isReadyToMove)
@@ -88,6 +92,13 @@ public class UnitController : MonoBehaviour
             pg.GridArray[xDestination, yDestination] = this;
             xPos = xDestination;
             yPos = yDestination;
+            
+            List<UnitController> list = new List<UnitController>();
+            //list.Add(secondaryUnit);
+            list.Add(this);
+            
+            if (GameManager.instance.isSetupComplete)
+                StartCoroutine(MatchCheck(list));    
 
             return secondaryUnit;
         //}
@@ -95,126 +106,113 @@ public class UnitController : MonoBehaviour
     }
 
     //calls for each moved unit
-    public IEnumerator MatchCheck (List<UnitController> list)
+    //todo: make this static and refactor accordingly?
+    public static IEnumerator MatchCheck (List<UnitController> list)
 	{
-        int mostRightRemoved = 0, mostLeftRemoved = 0;
+        int absoluteRightMost = PlayerGrid.MinColumn;
 
         foreach (UnitController checking in list) {
             //bool matchMade = false;
             List<UnitController> attackers = new List<UnitController>() { checking };
             List<UnitController> shielders = new List<UnitController>() { checking };
 
-            var x = checking.xPos;
-            var y = checking.yPos;
+            int x = checking.xPos;
+            int y = checking.yPos;
 
             #region AddMatchesToList
-            UnitController movedUnit = pg.GridArray[x, y];
+            UnitController movedUnit = checking.pg.GridArray[x, y];
             UnitController nextUnit;
 
-		    for (int left = -1; left >= -xPos; left--)
+		    for (int left = -1; left >= -checking.xPos; left--)
             {
                 if (x + left >= PlayerGrid.MinColumn) //in bounds
                 {
-                    nextUnit = pg.GridArray[x + left, y];
+                    nextUnit = checking.pg.GridArray[x + left, y];
                     if (movedUnit.data == nextUnit.data) attackers.Add(nextUnit);
                     else break;
                 }
             }
-            for (int up = -1; up >= -yPos; up--)
+            for (int up = -1; up >= -checking.yPos; up--)
             {
                 if (y + up >= 0) //in bounds
                 {
-                    nextUnit = pg.GridArray[x, y + up];
+                    nextUnit = checking.pg.GridArray[x, y + up];
                     if (movedUnit.data == nextUnit.data) shielders.Add(nextUnit);
                     else break;
                 }
             }
-            for (int right = 1; right <= PlayerGrid.GridWidth - 1 - xPos; right++)
+            for (int right = 1; right <= PlayerGrid.GridWidth - 1 - checking.xPos; right++)
 		    {
                 if (x + right < PlayerGrid.GridWidth)
                 {
-                    nextUnit = pg.GridArray[x + right, y];
+                    nextUnit = checking.pg.GridArray[x + right, y];
                     if (movedUnit.data == nextUnit.data) attackers.Add(nextUnit);
                     else break;
                 }
             }
  
-            for (int down = 1; down <= PlayerGrid.GridHeight - 1 - yPos; down++)
+            for (int down = 1; down <= PlayerGrid.GridHeight - 1 - checking.yPos; down++)
             {
                 if (y + down < PlayerGrid.GridHeight)
                 {
-                    nextUnit = pg.GridArray[x, y + down];
+                    nextUnit = checking.pg.GridArray[x, y + down];
                     if (movedUnit.data == nextUnit.data) shielders.Add(nextUnit);
                     else break;
                 }
             }
-			#endregion
+            #endregion
 
-			#region Debugging
-			string words = "shields: ";
-                foreach (UnitController s in shielders)
-                {
-                    words += String.Format("({0},{1})", s.xPos, s.yPos);
-                }
-
-                words = "attacks: ";
-                foreach (UnitController a in attackers)
-                {
-                    words += String.Format("({0},{1})", a.xPos, a.yPos);
-                }
-			#endregion
 
 			if (shielders.Count >= 3)
             {
-                int bottomRemoved = 0;
-                int topRemoved = PlayerGrid.GridHeight - 1;
+                int bottomMost = 0;
+                int topMost = PlayerGrid.GridHeight - 1;
 
                 string output = "shield: ";
 
                 foreach (UnitController uc in shielders)
                 {
-                    StartCoroutine(Shield(shielders));
                     output += uc.yPos + ", ";
                     //matchMade = true;
 
-                    if (uc.yPos > bottomRemoved) bottomRemoved = uc.yPos;
-                    if (uc.yPos < topRemoved) topRemoved = uc.yPos;
+                    if (uc.yPos > bottomMost) bottomMost = uc.yPos;
+                    if (uc.yPos < topMost) topMost = uc.yPos;
                 }
+
+                checking.StartCoroutine(Shield(shielders));
+                yield return new WaitForSeconds(UnitData.moveDuration);
+
+                checking.pg.MoveRowMulti(topMost, bottomMost, shielders[0].xPos + 1, shielders[0].xPos);
+
                 //optimization: refactor this to be less stupid
                 print(output);
-                print(String.Format("bot: {0}, top: {1}",bottomRemoved, topRemoved));
-                yield return new WaitForSeconds(2f);
-                pg.MoveRowMulti(topRemoved, bottomRemoved, shielders[0].xPos - 1, shielders[0].xPos);
             }
 
             if (attackers.Count >= 3)
             {
-                int rightRemoved = PlayerGrid.MinColumn;
-                int leftRemoved = PlayerGrid.GridWidth - 1;
+                int rightMost = PlayerGrid.MinColumn;
+                int leftMost = PlayerGrid.GridWidth - 1;
 
                 string output = "attack: ";
 
                 foreach (UnitController uc in attackers)
                 {
-                    StartCoroutine(Attack(attackers));
                     output += uc.xPos + ", ";
                     //matchMade = true;
 
-                    if (uc.xPos < leftRemoved) leftRemoved = uc.xPos;
-                    if (uc.xPos > rightRemoved) rightRemoved = uc.xPos;
+                    if (uc.xPos < leftMost) leftMost = uc.xPos;
+                    if (uc.xPos > rightMost) rightMost = uc.xPos;
                 }
-
+                checking.StartCoroutine(Attack(attackers));
                 yield return new WaitForSeconds(UnitData.attackFusionDelay + UnitData.moveDuration * 2);
-                
-                //broken: attack going to wrong row if double cursor reversed
-                print(yPos);
 
-                //optimization: might split into two types of functions
-                pg.MoveRow(yPos, leftRemoved - 1, rightRemoved - 1); //moves the left side in
-                pg.MoveRow(yPos, rightRemoved + 1, rightRemoved); //moves the right side back
+                checking.pg.MoveRow(attackers[0].yPos, leftMost - 1, rightMost - 1); //moves the left side in
+                checking.pg.MoveRow(attackers[0].yPos, rightMost + 1, rightMost); //moves the right side back
 
                 print(output);
+                if (rightMost > absoluteRightMost) absoluteRightMost = rightMost;
             }
+
         } //for each end
         
         /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
@@ -240,38 +238,35 @@ public class UnitController : MonoBehaviour
     }*/
 
 
-    //aesthetic: move shield to front and animate
+    //aesthetic: shield animate
     //todo: move to unit actions and do dependcy magic 
-    private IEnumerator Shield (List<UnitController> list)
+    private static IEnumerator Shield (List<UnitController> list)
 	{
-        yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
+        //optimization: added a fraction so that the shield move happens after multi row move. It's possible to fix this at some point
+        yield return new WaitForSeconds(UnitData.moveDuration + 0.01f); //waits for swap to complete
 
-        Destroy(this.gameObject);
+        /*foreach (UnitController uc in list)
+            Destroy(uc.gameObject);*/
+
+        for (int i = 0; i < list.Count; i++) list[i].Move(PlayerGrid.GridWidth - 1, list[i].yPos); //move to front
+        yield return new WaitForSeconds(UnitData.moveDuration + 0.4f); // waits for move to front
     }
 
     //aesthetic: split up into different parts and use function events from animations to sync up
-    private IEnumerator Attack (List<UnitController> list)
+    private static IEnumerator Attack (List<UnitController> list)
 	{
         yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
 
-        isReadyToMove = false;
+        //isReadyToMove = false;
 
-        for (int i = 1; i < list.Count; i++)
-		{
-            list[i].Move(list[0].xPos, list[0].yPos);
-		}
-        yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay); // waits for fusion to complete
+        for (int i = 1; i < list.Count; i++) { list[i].Move(list[0].xPos, list[0].yPos); } //fusion
+        yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
-        for (int i = 1; i < list.Count; i++)
-		{
-            Destroy(list[i].gameObject);
-		}
-
-		list[0].Move(PlayerGrid.GridWidth - 1, list[0].yPos);
-
+        for (int i = 1; i < list.Count; i++) { Destroy(list[i].gameObject); } 
+		list[0].Move(PlayerGrid.GridWidth - 1, list[0].yPos); //moves to front
         yield return new WaitForSeconds(UnitData.moveDuration + 0.4f); // waits for move to front
 
-        anim.SetBool("isAttack", true);
+        list[0].anim.SetBool("isAttack", true);
         //animation of attack
         //do a unit action?? destroy and move row again
     }
@@ -280,7 +275,7 @@ public class UnitController : MonoBehaviour
 
 
 
-[System.Serializable]
+[Serializable]
 public class example
 {
     public float mana;

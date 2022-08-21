@@ -70,12 +70,12 @@ public class PlayerGrid : MonoBehaviour
                     break;
             }
 
-            List<UnitController> swapped = new List<UnitController>();
-            swapped.Add(unit);
+            /*List<UnitController> swapped = new List<UnitController>();
+            swapped.Add(unit);*/
 
             if (secondaryUnit != null)
             {
-                swapped.Add(secondaryUnit);
+                //swapped.Add(secondaryUnit);
                 secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
             }
 
@@ -83,9 +83,14 @@ public class PlayerGrid : MonoBehaviour
                 //if (!fromSwap bool thing = MatchCheck(xDestination, yDestination);*/
 
             //note: this match check should go somwhere else
-            StartCoroutine(unit.MatchCheck(swapped));
+            //StartCoroutine(unit.MatchCheck(swapped));
         //}
     }
+
+
+
+
+
 
     public void ResetBoard(InputAction.CallbackContext context)
     {
@@ -103,6 +108,9 @@ public class PlayerGrid : MonoBehaviour
 	{
         if (topRow == bottomRow) throw new System.Exception("not a multi row, but called multirow function");
 
+        //print(String.Format("bot: {0}, top: {1}",bottomRow, topRow));
+
+
         for (int i = topRow; i <= bottomRow; i++)
 		{
             MoveRow(i, pulledFrom, destination);
@@ -117,9 +125,9 @@ public class PlayerGrid : MonoBehaviour
 
         if (pulledFrom > destination && pulledFrom <= PlayerGrid.GridWidth - 1) //pull from right
         {
-            for (int i = PlayerGrid.GridWidth - 1; i >= pulledFrom; i--)
+            //needs to move from left most not right most
+            for (int i = pulledFrom; i <= PlayerGrid.GridWidth - 1; i++)
             {
-                print(i);
                 GridArray[i, row].Move(i - 1, row);
             }
         }
@@ -139,7 +147,7 @@ public class PlayerGrid : MonoBehaviour
                 }
             }
         }
-        else { throw new System.Exception(string.Format("pulledFrom == destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
+        else if (pulledFrom == destination) { throw new System.Exception(string.Format("pulledFrom == destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
 
 
         /*if (pulledFrom < PlayerGrid.GridWidth - 1)
