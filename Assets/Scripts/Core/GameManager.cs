@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 	private void Start()
 	{
 		isSetupComplete = false;
-		StartCoroutine(Countdown());
+		StartCoroutine(RoundStartCountdown());
 	}
 
 	private void Awake()
@@ -73,15 +73,10 @@ public class GameManager : MonoBehaviour
 			throw new SystemException("player number does not match avilable player count");
 	}
 	
-	public IEnumerator Countdown ()
+	public IEnumerator RoundStartCountdown ()
 	{
 		yield return new WaitForSeconds(3f);
 		isSetupComplete=true;
 	}
 
-
-	private void Update()
-	{
-
-	}
 }

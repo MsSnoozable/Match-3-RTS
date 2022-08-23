@@ -10,8 +10,8 @@ public abstract class UnitData : ScriptableObject
 	public unitColors color;
 	public unitType type;
 	public unitRange range;
-	public static float moveDuration = 0.5f;
-	public static float attackFusionDelay = 0.01f;
+	public readonly static float moveDuration = 0.5f;
+	public readonly static float attackFusionDelay = 0.01f;
 
 	#endregion
 
