@@ -36,10 +36,16 @@ public class UnitController : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
         movable = true;
     }
-    public UnitController Summon(int xDestination, int yDestination)
+    public void Summon(int xDestination, int yDestination)
 	{
-        return null;
-	}
+        //smoke effects
+        //play summon animation
+        //sfx
+        transform.position = new Vector3(pg.cols[xDestination].position.x, pg.rows[yDestination].position.y, 0);
+        pg.GridArray[xDestination, yDestination] = this;
+        xPos = xDestination;
+        yPos = yDestination;
+    }
 
     //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
     public UnitController Move(int xDestination, int yDestination)
@@ -94,8 +100,9 @@ public class UnitController : MonoBehaviour
 
     public void RemoveUnit ()
 	{
-        StartCoroutine(pg.MoveRow(yPos, xPos - 1, xPos));
-        print(this.data.color);
+        //doesn't call because "wait until matchmakingcomplete"
+        //todo: find a way to store the values and call later instead of doing it through coroutines maybe?
+        pg.StartCoroutine(pg.MoveRow(yPos, xPos - 1, xPos));
         Destroy(this.gameObject);
 	}
 
@@ -145,9 +152,6 @@ public class UnitController : MonoBehaviour
         //do a unit action?? destroy and move row again
     }
 }
-
-
-
 
 [Serializable]
 public class example

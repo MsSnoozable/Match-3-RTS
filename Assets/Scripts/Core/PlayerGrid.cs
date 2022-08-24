@@ -74,14 +74,17 @@ public class PlayerGrid : MonoBehaviour
 
     public void ResetBoard(InputAction.CallbackContext context)
     {
-        foreach (UnitController uc in GridArray)
-		{
-            if (uc != null)
-                Destroy(uc.gameObject);
-		}
-        GameManager.instance.isSetupComplete = false;
-        StartCoroutine(GameManager.instance.RoundStartCountdown());
-		InitSpawnUnits();
+        if (context.performed)
+        {
+            foreach (UnitController uc in GridArray)
+            {
+                if (uc != null)
+                    Destroy(uc.gameObject);
+            }
+            GameManager.instance.isSetupComplete = false;
+            StartCoroutine(GameManager.instance.RoundStartCountdown());
+            InitSpawnUnits();
+        }
     }
 
 	public void MoveRowMulti(int topRow, int bottomRow, int pulledFrom, int destination)
@@ -105,6 +108,7 @@ public class PlayerGrid : MonoBehaviour
         //print(string.Format("r: {0}, pulled: {1}, dest: {2}" , row, pulledFrom, destination));
 
         yield return new WaitUntil(() => matchMakingComplete);
+        yield return new WaitForSeconds(UnitData.moveDuration);
 
         List<UnitController> toBeChecked = new List<UnitController>();
 
@@ -141,20 +145,6 @@ public class PlayerGrid : MonoBehaviour
         else if (pulledFrom == destination) { throw new System.Exception(string.Format("pulledFrom == destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
 
         MoveHappened(toBeChecked);
-
-
-        /*if (pulledFrom < PlayerGrid.GridWidth - 1)
-		{
-		}
-        else if (pulledFrom >= PlayerGrid.GridWidth - 1)
-		{
-            //donothign?
-            print("do nothing?");
-		}
-        else
-		{
-            throw new System.Exception("out of bounds pull attempt");
-		}*/
     }
 
     IEnumerator AddToQueue (int row /*int topOfReplace, int bottomOfReplace, int[] firsColumn*/)
@@ -208,12 +198,12 @@ public class PlayerGrid : MonoBehaviour
         int[] lastChoice_c = new int[GridWidth];
         int[] twoAgoChoice_c = new int[GridWidth]; 
 
-        for (int col = GridWidth - 1; col >= 0; col--) //set to 0 to include Queue in initializing. It's easier
+        for (int col = 0; col < GridWidth; col++) //set to 0 to include Queue in initializing. It's easier
 		{
             int lastChoice_r = RandomUnitIndex();
             int twoAgoChoice_r = RandomUnitIndex();
 
-			for (int row = GridHeight - 1; row >= 0; row--)
+			for (int row = 0; row < GridHeight; row++)
 			{
                 //todo: maybe make more random with RandomNumberGenerator
                 //RandomNumberGenerator rng = RandomNumberGenerator.Create();
@@ -226,8 +216,7 @@ public class PlayerGrid : MonoBehaviour
                 } while ((col > PlayerGrid.MinColumn) ? rng == twoAgoChoice_r || rng == twoAgoChoice_c[row] : rng == twoAgoChoice_r);
 
                 UnitController uc = CreateUnit(rng, row);
-				uc.Move(col, row);
-                //todo: make the uc add to grdiarray without move. They'll be summoned differently.
+				uc.Summon(col, row);
 
                 lastChoice_c[row] = rng; //just placed one becomes last choice
 
@@ -258,14 +247,14 @@ public class PlayerGrid : MonoBehaviour
     {
         foreach (UnitController item in toBeAdded)
         {
-            if (item == null) print("test");
+            if (item == null) print("problem");
 
             toBeChecked.Add(item);
         }
         wasMoved = true;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (wasMoved)
         {
@@ -286,7 +275,6 @@ public class PlayerGrid : MonoBehaviour
         List<UnitController> list = new List<UnitController>(passedList);
         foreach (UnitController checking in list)
         {
-
             if (!checking.movable) continue;
             List<UnitController> attackers = new List<UnitController>() { checking };
             List<UnitController> shielders = new List<UnitController>() { checking };
@@ -352,9 +340,9 @@ public class PlayerGrid : MonoBehaviour
                     if (uc.yPos < topMost) topMost = uc.yPos;
                 }
 
+                print(output);
                 checking.StartCoroutine(checking.Shield(shielders));
                 MoveRowMulti(topMost, bottomMost, shielders[0].xPos + 1, shielders[0].xPos);
-                print(output);
             }
 
             if (attackers.Count >= 3)
@@ -377,13 +365,14 @@ public class PlayerGrid : MonoBehaviour
                 StartCoroutine(MoveRow(attackers[0].yPos, rightMost + 1, rightMost)); //moves the right side back
 
                 print(output);
+                //todo: add this to modify the movment of things after a match
                 if (rightMost > absoluteRightMost) absoluteRightMost = rightMost;
             }
             #endregion
         } //for each end
 
         matchMakingComplete = true;
-
+        print("match check finished");
         /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
         add delay for each shield/attack fusion and movement animation*/
     }
