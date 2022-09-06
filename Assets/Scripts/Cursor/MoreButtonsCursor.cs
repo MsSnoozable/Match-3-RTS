@@ -17,29 +17,21 @@ public class MoreButtonsCursor : CursorScript
     {
         
     }
-    public override void Swapping(InputAction.CallbackContext context)
-    {
-        //2d vector with read value for each swap direction
 
-        throw new System.NotImplementedException();
-
-    }
-    public void SwapUp(InputAction.CallbackContext context)
+	protected override void Move(Vector2 moveDirection)
 	{
+		base.Move(moveDirection);
 
-	}
-    public void SwapDown(InputAction.CallbackContext context)
-    {
 
-    }
-    public void SwapRight(InputAction.CallbackContext context)
-    {
-
-    }
-    public void SwapLeft(InputAction.CallbackContext context)
-    {
-
+        //todo: make addons invisible on edges
     }
 
-
+	public override void Swapping(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Vector2 swapDirection = context.ReadValue<Vector2>();
+            GameManager.instance.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
+        }
+    }
 }

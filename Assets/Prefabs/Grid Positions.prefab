@@ -165,6 +165,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4543335997775964720}
   - component: {fileID: 4543335997775964721}
+  - component: {fileID: 9119906629785207010}
   m_Layer: 0
   m_Name: Grid Positions
   m_TagString: Player 1
@@ -224,6 +225,19 @@ MonoBehaviour:
   - {fileID: 4105362945620786469, guid: bb5e8293bc503ae49bba9b61517a598c, type: 3}
   - {fileID: 4105362945620786469, guid: f2831c263ada1824c805b235a4df4da5, type: 3}
   - {fileID: 4105362945620786469, guid: 0e434b0791033684e8a9f71a4f103c4c, type: 3}
+  matchMakingComplete: 0
+--- !u!114 &9119906629785207010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4543335997775964719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad2eed7d55e5ea43adec7db0c3e6445, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4543335998008687570
 GameObject:
   m_ObjectHideFlags: 0

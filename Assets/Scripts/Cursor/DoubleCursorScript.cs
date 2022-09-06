@@ -10,7 +10,6 @@ public class DoubleCursorScript : CursorScript
 
 	Transform secondaryCursor;
 
-	// Start is called before the first frame update
 	private void Start()
 	{
 		currentDirection = Direction.Down;
@@ -93,7 +92,7 @@ public class DoubleCursorScript : CursorScript
 	{
 		if (context.started)
 		{
-			GameManager.instance.DoubleCursorSwap(xPos, yPos, currentDirection);
+			GameManager.instance.DoubleCursorSwap(this.tag, xPos, yPos, currentDirection);
 		}
 	}
 

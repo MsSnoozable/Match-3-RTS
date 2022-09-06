@@ -1171,7 +1171,7 @@ MonoBehaviour:
   P1: {fileID: 0}
   P2: {fileID: 0}
   isSetupComplete: 0
-  player1CursorMode: 0
+  player1CursorMode: 2
   player2CursorMode: 0
   doubleCursor: {fileID: 8713779612850783099, guid: f9620a5f5bbe1df43ad8945d1858ffd0, type: 3}
   singleCursor: {fileID: 6291045336998852740, guid: 57ccb2f353e49c6419d076ecf595a362, type: 3}
@@ -1234,6 +1234,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 8867ac51-ca7f-4f56-bcaf-a9cf454d2c5e
     m_ActionName: Main/Reset Board[/Keyboard/f1]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 384130137}
+        m_TargetAssemblyTypeName: PlayerGrid, Core
+        m_MethodName: GridArrayChecker
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2ba1e82a-8f57-4965-92f6-106cee4df921
+    m_ActionName: Main/Check Grid[/Keyboard/f2]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Main
@@ -1816,15 +1832,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalScale.x
-      value: -1.225186
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.26
+      value: 9.19
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.47
+      value: 3.96
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6055,12 +6075,24 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.99999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.51
+      value: -9.11
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.82
+      value: 4.02
       objectReference: {fileID: 0}
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6093,6 +6125,10 @@ PrefabInstance:
     - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964720, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}

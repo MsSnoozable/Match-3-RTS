@@ -9,9 +9,7 @@ internal enum cursorOptions {
 
 public class GameManager : MonoBehaviour
 {
-	//need to learn: refactor with singleton pattern... ie. static "instance"
 	public static GameManager instance;
-
 
 	[HideInInspector] public PlayerStats P1;
 	[HideInInspector] public PlayerStats P2;
@@ -44,9 +42,30 @@ public class GameManager : MonoBehaviour
 		player2ChosenCursor = SetCurosrs(player2CursorMode);
 	}
 
-	public event Action<int, int, Direction> onDoubleCursorSwap;
+	public event Action<String, int, int, Direction> OnDoubleCursorSwap;
+	public event Action<String, int, int, Vector2> OnMoreButtonCursorSwap;
+	public event Action OnSwapFailed;
 
-	public void DoubleCursorSwap(int xPos, int yPos, Direction curosrOrientation) => onDoubleCursorSwap?.Invoke(xPos, yPos, curosrOrientation);
+	public event Func<UnitAttackInfo, IEnumerator> OnAttackCreated;
+	public event Action<UnitAttackInfo> OnAttackFusion;
+	public event Action<UnitAttackInfo> OnAttackHold;
+
+	public event Func<UnitShieldInfo, IEnumerator> OnShieldCreated;
+	public event Action<UnitShieldInfo> OnShieldFusion;
+	public event Action<UnitShieldInfo> OnShieldHold;
+
+	public void DoubleCursorSwap(String playerTag, int xPos, int yPos, Direction curosrOrientation) => OnDoubleCursorSwap?.Invoke(playerTag, xPos, yPos, curosrOrientation);
+	public void MoreButtonsCursorSwap(String playerTag, int xPos, int yPos, Vector2 swapDirection) => OnMoreButtonCursorSwap?.Invoke(playerTag, xPos, yPos, swapDirection);
+	public void SwapFailed() => OnSwapFailed?.Invoke();
+
+	public IEnumerator AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
+	public void AttackFusion(UnitAttackInfo attackInfo) => OnAttackFusion?.Invoke(attackInfo);
+	public void AttackHold(UnitAttackInfo attackInfo) => OnAttackHold?.Invoke(attackInfo);
+
+	public IEnumerator ShieldCreated(UnitShieldInfo shieldInfo) => OnShieldCreated?.Invoke(shieldInfo);
+	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
+	public void ShieldHold(UnitShieldInfo shieldInfo) => OnShieldHold?.Invoke(shieldInfo);
+
 
 	//todo: refactor so no return like a proper setter
 	private GameObject SetCurosrs(cursorOptions cO)

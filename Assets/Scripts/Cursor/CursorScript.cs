@@ -33,6 +33,8 @@ public abstract class CursorScript : MonoBehaviour
 
 	#region Controls
 
+	//todo: make all the pg dependencies use events to gm so it's decoupled
+
 	public abstract void Swapping(InputAction.CallbackContext context);
 	public void MoveHorizontal (InputAction.CallbackContext context)
 	{
@@ -98,8 +100,8 @@ public abstract class CursorScript : MonoBehaviour
 		xPos += Mathf.RoundToInt(moveDirection.x);
 		yPos -= Mathf.RoundToInt(moveDirection.y); //needs minus to invert
 
-		xPos = Mathf.Clamp(xPos, PlayerGrid.MinColumn, PlayerGrid.GridWidth);
-		yPos = Mathf.Clamp(yPos, PlayerGrid.MinColumn, PlayerGrid.GridHeight);
+		xPos = Mathf.Clamp(xPos, PlayerGrid.MinColumn, PlayerGrid.GridWidth - 1);
+		yPos = Mathf.Clamp(yPos, 0, PlayerGrid.GridHeight - 1);
 
 		transform.DOMove(new Vector2(
 			pg.cols[xPos].position.x,

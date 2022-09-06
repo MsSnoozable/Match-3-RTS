@@ -6,42 +6,6 @@
             "id": "0d24c181-ffc5-4c7b-be98-ccecda3eece7",
             "actions": [
                 {
-                    "name": "Swap Up",
-                    "type": "Button",
-                    "id": "572e0462-8ffd-4b99-b96b-67c72a7cc38d",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Swap Down",
-                    "type": "Button",
-                    "id": "bbb4e068-3237-4832-8891-8880c4ea1146",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Swap Left",
-                    "type": "Button",
-                    "id": "c2672927-6a0a-4a68-bf11-67b3fe70bea5",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Swap Right",
-                    "type": "Button",
-                    "id": "8a8bed6d-736f-48b6-ba44-dfc2c22b6e96",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Move Horizontal",
                     "type": "Button",
                     "id": "b0e88589-1fb0-43a2-be7c-ac337e367dbf",
@@ -76,31 +40,18 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Swapping",
+                    "type": "Value",
+                    "id": "6519dff4-5fb4-49f7-abbf-092e11466912",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "f503adf6-35ad-4c14-8a01-bf6d91401638",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Swap Up",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "11316d58-4a09-46ae-984b-2f3ce20bfbf9",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Swap Up",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "Keyboard",
                     "id": "f76bba8c-a2f0-4425-a227-1ae6bc745698",
@@ -190,70 +141,59 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "77adc834-db97-4bf1-abe3-3b5c73584fdf",
-                    "path": "<Keyboard>/space",
+                    "name": "2D Vector",
+                    "id": "54932ce3-a8d2-4054-9aed-0d0cc0f5fa49",
+                    "path": "2DVector",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap Down",
-                    "isComposite": false,
+                    "action": "Swapping",
+                    "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "dfd15409-e354-49fa-acc8-eede9712e464",
-                    "path": "<Gamepad>/buttonSouth",
+                    "name": "Up",
+                    "id": "bd86b6ea-202a-49b7-bab8-7d27ba36641c",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap Down",
+                    "action": "Swapping",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "12890a70-88e2-4983-9a7f-28ee833ef817",
-                    "path": "<Keyboard>/space",
+                    "name": "Down",
+                    "id": "c444ce5b-e898-4628-ae13-f30f3b052e34",
+                    "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap Left",
+                    "action": "Swapping",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "00eeb487-5696-493a-98fd-7f72a43004a0",
-                    "path": "<Gamepad>/buttonSouth",
+                    "name": "Left",
+                    "id": "0a18322c-9a68-4d3f-89b9-29cf3d6eca2e",
+                    "path": "<Keyboard>/leftArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap Left",
+                    "action": "Swapping",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "6b9088de-69d9-45ec-bec1-dda279542c2f",
-                    "path": "<Keyboard>/space",
+                    "name": "Right",
+                    "id": "0202c58c-28ba-46f4-aa52-a6896a60c227",
+                    "path": "<Keyboard>/rightArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap Right",
+                    "action": "Swapping",
                     "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "26c4d2ca-24f7-43a3-b584-d6d75da02288",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Swap Right",
-                    "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 }
             ]
         },
