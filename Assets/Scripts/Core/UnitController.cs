@@ -53,11 +53,27 @@ public class UnitController : MonoBehaviour
         yPos = yDestination;
     }
 
-    //todo: put all anim stuff seperately.
+    public UnitController Move(int xDestination, int yDestination)
+    {
+        return Internal_Move(xDestination, yDestination, null);
+    }
+    public UnitController Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    {
+        return Internal_Move(xDestination, yDestination, OnMoveCompleteCallback);
+    }
+    public UnitController Move(Vector2Int Destination)
+    {
+        return Internal_Move(Destination.x, Destination.y, null);
+    }
+    public UnitController Move(Vector2Int Destination, Action OnMoveCompleteCallback)
+    {
+        return Internal_Move(Destination.x, Destination.y, OnMoveCompleteCallback);
+    }
 
-    //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
-    public UnitController Move(int xDestination, int yDestination/*Action <info> OnCompleteCallback*/)
-	{
+
+    //todo: works only with Attack info instead of formation info. Either make more functions or learn how delegate casting works
+    UnitController Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    {
         //print(string.Format("({0}, {1})", xDestination, yDestination));
         anim.SetBool("isMove", true);
 
@@ -89,11 +105,8 @@ public class UnitController : MonoBehaviour
 
             if (xflip < 0) xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y);
-<<<<<<< Updated upstream
             //OnCompleteCallback();
-=======
             //OnMoveCompleteCallback();
->>>>>>> Stashed changes
         });
 
         UnitController secondaryUnit = pg.GridArray[xDestination, yDestination];
