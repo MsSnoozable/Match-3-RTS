@@ -89,7 +89,11 @@ public class UnitController : MonoBehaviour
 
             if (xflip < 0) xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y);
+<<<<<<< Updated upstream
             //OnCompleteCallback();
+=======
+            //OnMoveCompleteCallback();
+>>>>>>> Stashed changes
         });
 
         UnitController secondaryUnit = pg.GridArray[xDestination, yDestination];

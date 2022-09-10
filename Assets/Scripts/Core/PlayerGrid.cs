@@ -542,7 +542,7 @@ public class PlayerGrid : MonoBehaviour
         }
     }
     //todo: split up into different parts and use function events from animations to sync up
-    public virtual IEnumerator AttackCreated(UnitAttackInfo info)
+    public IEnumerator AttackCreated(UnitAttackInfo info)
     {
         if (info.pg == this)
         {
@@ -551,6 +551,7 @@ public class PlayerGrid : MonoBehaviour
 
             List<UnitController> attackers = new List<UnitController>(info.attackers);
 
+<<<<<<< Updated upstream
             matchMakingComplete = false;
             //end
 
@@ -560,6 +561,20 @@ public class PlayerGrid : MonoBehaviour
             yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
             GameManager.instance.AttackFusion(info);
+=======
+            
+            //attack fusion
+            //todo: works only with Attack info instead of formation info. Either make more functions or learn how delegate casting works
+            for (int i = 1; i < attackers.Count; i++)
+            {
+                attackers[i].Move(attackers[0].xPos, attackers[0].yPos, () => {}); 
+                //fusion //todo: currently calls fusion 3 times in a 3 match. Make it call once for the whole match
+                //using if (1) then call gm, else don't
+            }
+            yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
+
+            GameManager.i.AttackFusion(info);
+>>>>>>> Stashed changes
             //end
 
 
@@ -567,7 +582,12 @@ public class PlayerGrid : MonoBehaviour
             for (int i = 1; i < attackers.Count; i++) { Destroy(attackers[i].gameObject); }
             attackers[0].Move(PlayerGrid.GridWidth - 1, attackers[0].yPos); //moves to front
             yield return new WaitForSeconds(UnitData.moveDuration + 0.4f); // waits for move to front
+<<<<<<< Updated upstream
                                                                            //end
+
+=======
+            //end
+>>>>>>> Stashed changes
 
 
             //hold
