@@ -9,7 +9,7 @@ internal enum cursorOptions {
 
 public class GameManager : MonoBehaviour
 {
-	public static GameManager instance;
+	public static GameManager i;
 
 	[HideInInspector] public PlayerStats P1;
 	[HideInInspector] public PlayerStats P2;
@@ -37,13 +37,13 @@ public class GameManager : MonoBehaviour
 
 	private void Awake()
 	{
-		instance = this;
+		i = this;
 		player1ChosenCursor = SetCurosrs(player1CursorMode);
 		player2ChosenCursor = SetCurosrs(player2CursorMode);
 	}
 
 	public event Action<String, int, int, Direction> OnDoubleCursorSwap;
-	public event Action<String, int, int, Vector2> OnMoreButtonCursorSwap;
+	public event Action<String, int, int, Vector2Int> OnMoreButtonCursorSwap;
 	public event Action OnSwapFailed;
 
 	public event Func<UnitAttackInfo, IEnumerator> OnAttackCreated;
@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
 	public event Action<UnitShieldInfo> OnShieldHold;
 
 	public void DoubleCursorSwap(String playerTag, int xPos, int yPos, Direction curosrOrientation) => OnDoubleCursorSwap?.Invoke(playerTag, xPos, yPos, curosrOrientation);
-	public void MoreButtonsCursorSwap(String playerTag, int xPos, int yPos, Vector2 swapDirection) => OnMoreButtonCursorSwap?.Invoke(playerTag, xPos, yPos, swapDirection);
+	public void MoreButtonsCursorSwap(String playerTag, int xPos, int yPos, Vector2Int swapDirection) => OnMoreButtonCursorSwap?.Invoke(playerTag, xPos, yPos, swapDirection);
 	public void SwapFailed() => OnSwapFailed?.Invoke();
 
 	public IEnumerator AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
@@ -83,6 +83,7 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	//optimization: use "indexed default property" to clean this up with get property
 	public GameObject GetCursor(string playerNumber) {
 		if (playerNumber == "Player 1")
 			return player1ChosenCursor;

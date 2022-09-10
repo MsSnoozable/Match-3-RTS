@@ -6,24 +6,25 @@ using UnityEngine.InputSystem;
 
 public class MoreButtonsCursor : CursorScript
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-	protected override void Move(Vector2 moveDirection)
+    [SerializeField] private GameObject leftAddon;
+    [SerializeField] private GameObject rightAddon;
+    [SerializeField] private GameObject topAddon;
+    [SerializeField] private GameObject bottomAddon;
+    protected override void Move(Vector2 moveDirection)
 	{
 		base.Move(moveDirection);
 
+        if (xPos == PlayerGrid.MinColumn) leftAddon.SetActive(false);
+        else leftAddon.SetActive(true);
 
-        //todo: make addons invisible on edges
+        if (yPos == 0) topAddon.SetActive(false);
+        else topAddon.SetActive(true);
+        
+        if (xPos == PlayerGrid.GridWidth - 1) rightAddon.SetActive(false);
+        else rightAddon.SetActive(true);
+        
+        if (yPos == PlayerGrid.GridHeight - 1) bottomAddon.SetActive(false);
+        else bottomAddon.SetActive(true);
     }
 
 	public override void Swapping(InputAction.CallbackContext context)
@@ -31,7 +32,8 @@ public class MoreButtonsCursor : CursorScript
         if (context.performed)
         {
             Vector2 swapDirection = context.ReadValue<Vector2>();
-            GameManager.instance.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
+            Vector2Int intSwapDirection = new Vector2Int((int)swapDirection.x, (int)swapDirection.y);
+            GameManager.i.MoreButtonsCursorSwap(this.tag, xPos, yPos, intSwapDirection);
         }
     }
 }

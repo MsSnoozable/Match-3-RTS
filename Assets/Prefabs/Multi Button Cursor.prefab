@@ -357,6 +357,10 @@ MonoBehaviour:
   moveDuration: 0.15
   playerInput: {fileID: 0}
   pg: {fileID: 0}
+  leftAddon: {fileID: 4192164833820111445}
+  rightAddon: {fileID: 6637661514837496212}
+  topAddon: {fileID: 297196409473782398}
+  bottomAddon: {fileID: 2292276811124662830}
 --- !u!114 &372972766767086594
 MonoBehaviour:
   m_ObjectHideFlags: 0
