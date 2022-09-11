@@ -14,14 +14,14 @@ public class SoundManager : MonoBehaviour
 
 		}
 
-		GameManager.i.OnAttackCreated += AttackCreatedSound;
+		GameManager.instance.OnAttackCreated += AttackCreatedSound;
 
-		GameManager.i.OnShieldCreated += ShieldCreatedSound;
-		GameManager.i.OnShieldFusion += ShieldFusionSound;
-		GameManager.i.OnShieldHold += ShieldHoldSound;
+		GameManager.instance.OnShieldCreated += ShieldCreatedSound;
+		GameManager.instance.OnShieldFusion += ShieldFusionSound;
+		GameManager.instance.OnShieldHold += ShieldHoldSound;
 
-		//GameManager.i.OnMoreButtonCursorSwap += SwapSound;
-		//GameManager.i.OnDoubleCursorSwap += SwapSound;
+		//GameManager.instance.OnMoreButtonCursorSwap += SwapSound;
+		//GameManager.instance.OnDoubleCursorSwap += SwapSound;
 	}
 
 	void SwapSound ()

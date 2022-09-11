@@ -36,11 +36,11 @@ public class PlayerGrid : MonoBehaviour
     #endregion
 	private void OnDestroy()
 	{
-        GameManager.i.OnDoubleCursorSwap -= DoubleCursorSwap;
-        GameManager.i.OnAttackCreated -= AttackCreated;
-        GameManager.i.OnAttackFusion -= AttackFuse;
-        GameManager.i.OnShieldCreated -= ShieldCreated;
-        GameManager.i.OnMoreButtonCursorSwap -= MoreButtonsSwap;
+        GameManager.instance.OnDoubleCursorSwap -= DoubleCursorSwap;
+        GameManager.instance.OnAttackCreated -= AttackCreated;
+        GameManager.instance.OnAttackFusion -= AttackFuse;
+        GameManager.instance.OnShieldCreated -= ShieldCreated;
+        GameManager.instance.OnMoreButtonCursorSwap -= MoreButtonsSwap;
 
     }
 
@@ -48,17 +48,17 @@ public class PlayerGrid : MonoBehaviour
 	{
 		InitSpawnUnits();
         
-        GameObject cursor = Instantiate(GameManager.i.GetCursor(this.gameObject.tag), transform);
+        GameObject cursor = Instantiate(GameManager.instance.GetCursor(this.gameObject.tag), transform);
         cursor.tag = this.tag;
         //optimization: could add pg in cursor here for cleaner observer pattern
 
-        GameManager.i.OnDoubleCursorSwap += DoubleCursorSwap;
+        GameManager.instance.OnDoubleCursorSwap += DoubleCursorSwap;
 
 
-        GameManager.i.OnAttackCreated += AttackCreated;
-        GameManager.i.OnAttackFusion += AttackFuse;
-        GameManager.i.OnShieldCreated += ShieldCreated;
-        GameManager.i.OnMoreButtonCursorSwap += MoreButtonsSwap;
+        GameManager.instance.OnAttackCreated += AttackCreated;
+        GameManager.instance.OnAttackFusion += AttackFuse;
+        GameManager.instance.OnShieldCreated += ShieldCreated;
+        GameManager.instance.OnMoreButtonCursorSwap += MoreButtonsSwap;
     }
 
     public void DoubleCursorSwap(string playerTag, int xPos, int yPos, Direction currentDirection)
@@ -72,7 +72,7 @@ public class PlayerGrid : MonoBehaviour
 			{
                 //swap failed
                 //fire event
-                GameManager.i.SwapFailed();
+                GameManager.instance.SwapFailed();
                 return;
 			}
 
@@ -97,7 +97,7 @@ public class PlayerGrid : MonoBehaviour
 			{
                 //swap failed
                 //fire event
-                GameManager.i.SwapFailed();
+                GameManager.instance.SwapFailed();
                 return;
             }
 
@@ -122,7 +122,7 @@ public class PlayerGrid : MonoBehaviour
                 //swap failed
                 //fire event
                 //todo: event for can't swap eh eh sound and such
-                GameManager.i.SwapFailed();
+                GameManager.instance.SwapFailed();
                 return;
             }
 
@@ -156,7 +156,7 @@ public class PlayerGrid : MonoBehaviour
             {
                 //swap failed
                 //fire event
-                GameManager.i.SwapFailed();
+                GameManager.instance.SwapFailed();
                 return;
             }
             
@@ -176,8 +176,8 @@ public class PlayerGrid : MonoBehaviour
                 if (uc != null)
                     Destroy(uc.gameObject);
             }
-            GameManager.i.isSetupComplete = false;
-            StartCoroutine(GameManager.i.RoundStartCountdown());
+            GameManager.instance.isSetupComplete = false;
+            StartCoroutine(GameManager.instance.RoundStartCountdown());
             InitSpawnUnits();
         }
     }
@@ -459,7 +459,7 @@ public class PlayerGrid : MonoBehaviour
                 }
 
                 UnitShieldInfo info = new UnitShieldInfo(shielders[0].xPos, topMost, bottomMost, shielders, this);
-                StartCoroutine(GameManager.i.ShieldCreated(info));
+                StartCoroutine(GameManager.instance.ShieldCreated(info));
 
                 print(output);
             }
@@ -480,7 +480,7 @@ public class PlayerGrid : MonoBehaviour
                 }
                 UnitAttackInfo info = new UnitAttackInfo(attackers[0].yPos, leftMost, rightMost, attackers, this);
 
-                StartCoroutine(GameManager.i.AttackCreated(info));
+                StartCoroutine(GameManager.instance.AttackCreated(info));
 
                 //print(output);
 
@@ -551,6 +551,7 @@ public class PlayerGrid : MonoBehaviour
 
             List<UnitController> attackers = new List<UnitController>(info.attackers);
 
+<<<<<<< Updated upstream
             matchMakingComplete = false;
             //end
 
@@ -559,7 +560,8 @@ public class PlayerGrid : MonoBehaviour
             for (int i = 1; i < attackers.Count; i++) attackers[i].Move(attackers[0].xPos, attackers[0].yPos); //fusion
             yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
-            GameManager.i.AttackFusion(info);
+            GameManager.instance.AttackFusion(info);
+=======
             
             //attack fusion
             //todo: works only with Attack info instead of formation info. Either make more functions or learn how delegate casting works
@@ -572,6 +574,7 @@ public class PlayerGrid : MonoBehaviour
             yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
             GameManager.i.AttackFusion(info);
+>>>>>>> Stashed changes
             //end
 
 
@@ -579,8 +582,12 @@ public class PlayerGrid : MonoBehaviour
             for (int i = 1; i < attackers.Count; i++) { Destroy(attackers[i].gameObject); }
             attackers[0].Move(PlayerGrid.GridWidth - 1, attackers[0].yPos); //moves to front
             yield return new WaitForSeconds(UnitData.moveDuration + 0.4f); // waits for move to front
-            //end
+<<<<<<< Updated upstream
+                                                                           //end
 
+=======
+            //end
+>>>>>>> Stashed changes
 
 
             //hold

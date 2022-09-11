@@ -31,7 +31,7 @@ public class MoreButtonsCursor : CursorScript
         if (context.performed)
         {
             Vector2 swapDirection = context.ReadValue<Vector2>();
-            GameManager.i.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
+            GameManager.instance.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
         }
     }
 }
