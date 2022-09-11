@@ -539,8 +539,6 @@ public class PlayerGrid : MonoBehaviour
     {
         if (info.pg == this)
         {
-            //optimization: added a fraction so that the shield move happens after multi row move. It's possible to fix this at some point
-            yield return new WaitForSeconds(UnitData.moveDuration + 0.01f); //waits for swap to complete
             List<UnitController> shielders = new List<UnitController>(info.shielders);
 
             foreach (UnitController shielder in shielders)
@@ -550,6 +548,8 @@ public class PlayerGrid : MonoBehaviour
                 //info.shielders[i].anim.SetBool("isShield", true);
             }
 
+            //optimization: added a fraction so that the shield move happens after multi row move. It's possible to fix this at some point
+            yield return new WaitForSeconds(UnitData.moveDuration + 0.01f); //waits for swap to complete
             //broken: doesn't accomodate swapping and temp values... go back and rework a bunch of stuff
             MoveRowMulti(info.topMost, info.bottomMost, info.col + 1, info.col);
 
@@ -571,18 +571,18 @@ public class PlayerGrid : MonoBehaviour
     {
         if (info.pg == this)
         {
-            //attack created
-            yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
-
             List<UnitController> attackers = new List<UnitController>(info.attackers);
-
-            //end
-
             foreach (UnitController attacker in attackers)
             {
                 attacker.swappable = false;
                 attacker.isAttack = true;
             }
+            //attack created
+            yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
+
+
+            //end
+
 
 
             //attack fusion
@@ -591,17 +591,14 @@ public class PlayerGrid : MonoBehaviour
 
             GameManager.i.AttackFusion(info);
             
-            //attack fusion
+            /*//attack fusion
             //todo: works only with Attack info instead of formation info. Either make more functions or learn how delegate casting works
             for (int i = 1; i < attackers.Count; i++)
             {
                 attackers[i].Move(attackers[0].xPos, attackers[0].yPos, () => {}); 
                 //fusion //todo: currently calls fusion 3 times in a 3 match. Make it call once for the whole match
                 //using if (1) then call gm, else don't
-            }
-            yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
-
-            GameManager.i.AttackFusion(info);
+            }*/
             //end
 
 
