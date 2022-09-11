@@ -36,11 +36,11 @@ public class PlayerGrid : MonoBehaviour
     #endregion
 	private void OnDestroy()
 	{
-        GameManager.instance.OnDoubleCursorSwap -= DoubleCursorSwap;
-        GameManager.instance.OnAttackCreated -= AttackCreated;
-        GameManager.instance.OnAttackFusion -= AttackFuse;
-        GameManager.instance.OnShieldCreated -= ShieldCreated;
-        GameManager.instance.OnMoreButtonCursorSwap -= MoreButtonsSwap;
+        GameManager.i.OnDoubleCursorSwap -= DoubleCursorSwap;
+        GameManager.i.OnAttackCreated -= AttackCreated;
+        GameManager.i.OnAttackFusion -= AttackFuse;
+        GameManager.i.OnShieldCreated -= ShieldCreated;
+        GameManager.i.OnMoreButtonCursorSwap -= MoreButtonsSwap;
 
     }
 
@@ -48,17 +48,17 @@ public class PlayerGrid : MonoBehaviour
 	{
 		InitSpawnUnits();
         
-        GameObject cursor = Instantiate(GameManager.instance.GetCursor(this.gameObject.tag), transform);
+        GameObject cursor = Instantiate(GameManager.i.GetCursor(this.gameObject.tag), transform);
         cursor.tag = this.tag;
         //optimization: could add pg in cursor here for cleaner observer pattern
 
-        GameManager.instance.OnDoubleCursorSwap += DoubleCursorSwap;
+        GameManager.i.OnDoubleCursorSwap += DoubleCursorSwap;
 
 
-        GameManager.instance.OnAttackCreated += AttackCreated;
-        GameManager.instance.OnAttackFusion += AttackFuse;
-        GameManager.instance.OnShieldCreated += ShieldCreated;
-        GameManager.instance.OnMoreButtonCursorSwap += MoreButtonsSwap;
+        GameManager.i.OnAttackCreated += AttackCreated;
+        GameManager.i.OnAttackFusion += AttackFuse;
+        GameManager.i.OnMoreButtonCursorSwap += MoreButtonsSwap;
+        GameManager.i.OnShieldCreated += ShieldCreated;
     }
 
     public void DoubleCursorSwap(string playerTag, int xPos, int yPos, Direction currentDirection)
@@ -72,7 +72,7 @@ public class PlayerGrid : MonoBehaviour
 			{
                 //swap failed
                 //fire event
-                GameManager.instance.SwapFailed();
+                GameManager.i.SwapFailed();
                 return;
 			}
 
@@ -97,7 +97,7 @@ public class PlayerGrid : MonoBehaviour
 			{
                 //swap failed
                 //fire event
-                GameManager.instance.SwapFailed();
+                GameManager.i.SwapFailed();
                 return;
             }
 
@@ -122,7 +122,7 @@ public class PlayerGrid : MonoBehaviour
                 //swap failed
                 //fire event
                 //todo: event for can't swap eh eh sound and such
-                GameManager.instance.SwapFailed();
+                GameManager.i.SwapFailed();
                 return;
             }
 
@@ -150,17 +150,29 @@ public class PlayerGrid : MonoBehaviour
                 return; // doesn't run if OOB
             }
 
+            secondaryUnit = GridArray[moveToSpace.x, moveToSpace.y];
+
+            /*if (yPos > 0 &&
+                xPos < PlayerGrid.GridWidth - 1 &&
+                yPos < PlayerGrid.GridHeight - 1 && 
+                xPos > PlayerGrid.MinColumn)
+			{
+                moveToSpace = swapDirection + new Vector2Int(xPos, yPos);
+                secondaryUnit = GridArray[moveToSpace.x, moveToSpace.y];
+			}
+            else { return; }*/
+
             //unit.Move(xPos + (int)swapDirection.x, yPos - (int)swapDirection.y);
 
             if (secondaryUnit == null || !secondaryUnit.swappable)
             {
                 //swap failed
                 //fire event
-                GameManager.instance.SwapFailed();
+                GameManager.i.SwapFailed();
                 return;
             }
-            
-            secondaryUnit = unit.Move(moveToSpace.x, moveToSpace.y); //optimization: make overload for Move() with a V2
+
+            secondaryUnit = unit.Move(moveToSpace);
 
             secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
             MoveHappened(new List<UnitController> { unit, secondaryUnit });
@@ -176,8 +188,8 @@ public class PlayerGrid : MonoBehaviour
                 if (uc != null)
                     Destroy(uc.gameObject);
             }
-            GameManager.instance.isSetupComplete = false;
-            StartCoroutine(GameManager.instance.RoundStartCountdown());
+            GameManager.i.isSetupComplete = false;
+            StartCoroutine(GameManager.i.RoundStartCountdown());
             InitSpawnUnits();
         }
     }
@@ -400,6 +412,7 @@ public class PlayerGrid : MonoBehaviour
     {
         int absoluteRightMost = PlayerGrid.MinColumn;
 
+
         List<UnitController> toBeChecked = new List<UnitController>(passedList);
 
         foreach (UnitController checking in toBeChecked)
@@ -418,33 +431,39 @@ public class PlayerGrid : MonoBehaviour
             for (int left = -1; left - PlayerGrid.MinColumn >= -x; left--)
             {
                 nextUnit = checking.pg.GridArray[x + left, y];
-                if (movedUnit.data == nextUnit.data) attackers.Add(nextUnit);
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
                 else break;
             }
             for (int up = -1; up >= -y; up--)
             {
                 nextUnit = checking.pg.GridArray[x, y + up];
-                if (movedUnit.data == nextUnit.data) shielders.Add(nextUnit);
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
                 else break;
             }
             for (int right = 1; right <= PlayerGrid.GridWidth - 1 - x; right++)
             {
                 nextUnit = checking.pg.GridArray[x + right, y];
-                if (movedUnit.data == nextUnit.data) attackers.Add(nextUnit);
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
                 else break;
             }
 
             for (int down = 1; down <= PlayerGrid.GridHeight - 1 - y; down++)
             {
                 nextUnit = checking.pg.GridArray[x, y + down];
-                if (movedUnit.data == nextUnit.data) shielders.Add(nextUnit);
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
                 else break;
                 
             }
             #endregion
 
+
             #region Shield/Attack
-            if (shielders.Count >= 3)
+            if (shielders.Count >= 3 && attackers.Count >= 3)
+			{
+                print("double");
+			}
+
+            else if (shielders.Count >= 3)
             {
                 int bottomMost = 0;
                 int topMost = PlayerGrid.GridHeight - 1;
@@ -459,12 +478,13 @@ public class PlayerGrid : MonoBehaviour
                 }
 
                 UnitShieldInfo info = new UnitShieldInfo(shielders[0].xPos, topMost, bottomMost, shielders, this);
-                StartCoroutine(GameManager.instance.ShieldCreated(info));
+                //StartCoroutine(GameManager.i.ShieldCreated(info));
+                StartCoroutine(ShieldCreated(info));
 
                 print(output);
             }
 
-            if (attackers.Count >= 3)
+            else if (attackers.Count >= 3)
             {
                 int rightMost = PlayerGrid.MinColumn;
                 int leftMost = PlayerGrid.GridWidth - 1;
@@ -480,7 +500,8 @@ public class PlayerGrid : MonoBehaviour
                 }
                 UnitAttackInfo info = new UnitAttackInfo(attackers[0].yPos, leftMost, rightMost, attackers, this);
 
-                StartCoroutine(GameManager.instance.AttackCreated(info));
+                StartCoroutine(GameManager.i.AttackCreated(info));
+                StartCoroutine(AttackCreated(info));
 
                 //print(output);
 
@@ -490,8 +511,6 @@ public class PlayerGrid : MonoBehaviour
             #endregion
         } //for each end
 
-        matchMakingComplete = true;
-        //print("match check finished");
         /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
         add delay for each shield/attack fusion and movement animation*/
     }
@@ -522,8 +541,14 @@ public class PlayerGrid : MonoBehaviour
         {
             //optimization: added a fraction so that the shield move happens after multi row move. It's possible to fix this at some point
             yield return new WaitForSeconds(UnitData.moveDuration + 0.01f); //waits for swap to complete
+            List<UnitController> shielders = new List<UnitController>(info.shielders);
 
-            matchMakingComplete = false;
+            foreach (UnitController shielder in shielders)
+            {
+                shielder.swappable = false;
+                shielder.isShield = true;
+                //info.shielders[i].anim.SetBool("isShield", true);
+            }
 
             //broken: doesn't accomodate swapping and temp values... go back and rework a bunch of stuff
             MoveRowMulti(info.topMost, info.bottomMost, info.col + 1, info.col);
@@ -551,17 +576,20 @@ public class PlayerGrid : MonoBehaviour
 
             List<UnitController> attackers = new List<UnitController>(info.attackers);
 
-<<<<<<< Updated upstream
-            matchMakingComplete = false;
             //end
+
+            foreach (UnitController attacker in attackers)
+            {
+                attacker.swappable = false;
+                attacker.isAttack = true;
+            }
 
 
             //attack fusion
             for (int i = 1; i < attackers.Count; i++) attackers[i].Move(attackers[0].xPos, attackers[0].yPos); //fusion
             yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
-            GameManager.instance.AttackFusion(info);
-=======
+            GameManager.i.AttackFusion(info);
             
             //attack fusion
             //todo: works only with Attack info instead of formation info. Either make more functions or learn how delegate casting works
@@ -574,7 +602,6 @@ public class PlayerGrid : MonoBehaviour
             yield return new WaitForSeconds(UnitData.moveDuration + UnitData.attackFusionDelay);
 
             GameManager.i.AttackFusion(info);
->>>>>>> Stashed changes
             //end
 
 
@@ -582,12 +609,9 @@ public class PlayerGrid : MonoBehaviour
             for (int i = 1; i < attackers.Count; i++) { Destroy(attackers[i].gameObject); }
             attackers[0].Move(PlayerGrid.GridWidth - 1, attackers[0].yPos); //moves to front
             yield return new WaitForSeconds(UnitData.moveDuration + 0.4f); // waits for move to front
-<<<<<<< Updated upstream
                                                                            //end
 
-=======
             //end
->>>>>>> Stashed changes
 
 
             //hold

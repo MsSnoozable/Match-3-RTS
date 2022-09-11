@@ -9,7 +9,7 @@ internal enum cursorOptions {
 
 public class GameManager : MonoBehaviour
 {
-	public static GameManager instance;
+	public static GameManager i;
 
 	[HideInInspector] public PlayerStats P1;
 	[HideInInspector] public PlayerStats P2;
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
 
 	private void Awake()
 	{
-		instance = this;
+		i = this;
 		player1ChosenCursor = SetCurosrs(player1CursorMode);
 		player2ChosenCursor = SetCurosrs(player2CursorMode);
 	}
