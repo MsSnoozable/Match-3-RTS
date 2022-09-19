@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2280935410040351561}
   - component: {fileID: 2681432502684967125}
   m_Layer: 0
-  m_Name: Unit 3
+  m_Name: Pink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PriestController : UnitController
 {
-/*	public override IEnumerator AttackCreated (UnitAttackInfo info)
+/*	public override IEnumerator Attack_Created (UnitAttackInfo info)
 	{
-		//base.AttackCreated()
+		//base.Attack_Created()
 		//healing
 		yield return null;
 	}*/

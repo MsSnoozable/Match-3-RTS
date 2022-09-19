@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2280935410040351561}
   - component: {fileID: 2681432502684967125}
   m_Layer: 0
-  m_Name: Unit 5
+  m_Name: Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28719dd96e317434591c91b20caba041, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 7bced8313518dda4a923cedafa48cc7e, type: 2}
+  data: {fileID: 11400000, guid: 0ee5123350184fe44b8dd007e8a50d26, type: 2}
   justMoved: 0
   pg: {fileID: 0}
   gameManager: {fileID: 0}
@@ -118,7 +118,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

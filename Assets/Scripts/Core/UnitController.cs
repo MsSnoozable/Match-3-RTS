@@ -11,18 +11,7 @@ public class UnitController : MonoBehaviour
     public UnitData data;
     public bool justMoved = false;
     [HideInInspector] public PlayerGrid pg;
-    public GameManager gameManager;
     public int unitIndex; //note: might need later for more optimized randomization.
-    #endregion
-
-    #region Private Fields
-
-    [HideInInspector] public int xPos = 0;
-    [HideInInspector] public int yPos = 0;
-    [HideInInspector] public bool swappable;
-    bool _isIdle;
-    bool _isAttack;
-    bool _isShield;
     [HideInInspector] public bool isIdle
     {
         get { return _isIdle; }
@@ -31,6 +20,9 @@ public class UnitController : MonoBehaviour
             _isIdle = value;
             _isAttack = !value;
             _isShield = !value;
+            anim.SetBool("isIdle", value);
+            anim.SetBool("isAttack", !value);
+            anim.SetBool("isShield", !value);
         }
     }
     [HideInInspector] public bool isAttack
@@ -41,6 +33,9 @@ public class UnitController : MonoBehaviour
             _isIdle = !value;
             _isAttack = value;
             _isShield = !value;
+            anim.SetBool("isIdle", !value);
+            anim.SetBool("isAttack", value);
+            anim.SetBool("isShield", !value);
         }
     }
     [HideInInspector] public bool isShield
@@ -51,32 +46,47 @@ public class UnitController : MonoBehaviour
             _isIdle = !value;
             _isAttack = !value;
             _isShield = value;
+            anim.SetBool("isIdle", !value);
+            anim.SetBool("isAttack", !value);
+            anim.SetBool("isShield", value);
         }
     }
+    [HideInInspector] public int xPos = 0;
+    [HideInInspector] public int yPos = 0;
+    [HideInInspector] public bool swappable;
+
+
+
+    #endregion
+
+    #region Private Fields
+
+    bool _isIdle;
+    bool _isAttack;
+    bool _isShield;
 
     //References
     Animator anim;
 
-	#endregion
+    #endregion
 
     private void OnDestroy()
-	{
+    {
 
     }
 
-	public example ex;
+    public example ex;
 
-	private void Awake()
-	{
+    private void Awake()
+    {
         anim = this.GetComponent<Animator>();
 
         anim.SetBool("isIdle", true);
-        gameManager = FindObjectOfType<GameManager>();
         swappable = true;
         isIdle = true;
     }
     public void Summon(int xDestination, int yDestination)
-	{
+    {
         //smoke effects
         //play summon animation
         //sfx
@@ -104,9 +114,8 @@ public class UnitController : MonoBehaviour
     }
 
     //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
-    public UnitController Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
-	{
-        //print(string.Format("({0}, {1})", xDestination, yDestination));
+    UnitController Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    {
         anim.SetBool("isMove", true);
 
         Vector3 Destination = new Vector3(pg.cols[xDestination].position.x, pg.rows[yDestination].position.y, 0);
@@ -137,38 +146,33 @@ public class UnitController : MonoBehaviour
 
             if (xflip < 0) xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y);
-            //OnCompleteCallback();
-            //OnMoveCompleteCallback();
+            
+            OnMoveCompleteCallback?.Invoke();
         });
 
+       
+        //temp = x
+        //x = y
+        //y = temp
         UnitController secondaryUnit = pg.GridArray[xDestination, yDestination];
         pg.GridArray[xDestination, yDestination] = this;
         xPos = xDestination;
         yPos = yDestination;
 
-        List<UnitController> list = new List<UnitController>();
-        list.Add(this);
+        //todo: update grid array via event so that not every unit has reference to pg?
 
         return secondaryUnit;
-        
     }
 
-/*
-    UnitController Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
-	{
-
-	}
-
-    void MoveInternal (int, int, AsyncCallback, Vector2)
-	{
-
-	}
-*/
-
-    public void RemoveUnit ()
-	{
+    public void RemoveUnit()
+    {
         pg.MoveRow(yPos, xPos - 1, xPos);
         Destroy(this.gameObject);
+    }
+
+    public void RemoveFromGrid()
+	{
+        pg.GridArray[xPos, yPos] = null;
 	}
 }
 

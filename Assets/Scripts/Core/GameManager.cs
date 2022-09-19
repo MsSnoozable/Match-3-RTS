@@ -47,7 +47,8 @@ public class GameManager : MonoBehaviour
 	public event Action OnSwapFailed;
 
 	public event Func<UnitAttackInfo, IEnumerator> OnAttackCreated;
-	public event Action<UnitAttackInfo> OnAttackFusion;
+	public event Action<UnitAttackInfo> OnAttackCombine;
+	public event Action<UnitAttackInfo> OnAttackFuse;
 	public event Action<UnitAttackInfo> OnAttackHold;
 
 	public event Func<UnitShieldInfo, IEnumerator> OnShieldCreated;
@@ -59,8 +60,9 @@ public class GameManager : MonoBehaviour
 	public void SwapFailed() => OnSwapFailed?.Invoke();
 
 	public IEnumerator AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
-	public void AttackFusion(UnitAttackInfo attackInfo) => OnAttackFusion?.Invoke(attackInfo);
+	public void AttackCombine(UnitAttackInfo attackInfo) => OnAttackCombine?.Invoke(attackInfo);
 	public void AttackHold(UnitAttackInfo attackInfo) => OnAttackHold?.Invoke(attackInfo);
+	public void AttackFuse(UnitAttackInfo attackInfo) => OnAttackFuse?.Invoke(attackInfo);
 
 	public IEnumerator ShieldCreated(UnitShieldInfo shieldInfo) => OnShieldCreated?.Invoke(shieldInfo);
 	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
