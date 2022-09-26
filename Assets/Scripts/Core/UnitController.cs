@@ -6,7 +6,13 @@ using DG.Tweening;
 
 public class UnitController : MonoBehaviour
 {
+
     #region Public Fields
+    public void SetGridPosition(int x, int y)
+	{
+        xPos = x;
+        yPos = y;
+	}
 
     public UnitData data;
     public bool justMoved = false;
@@ -53,9 +59,13 @@ public class UnitController : MonoBehaviour
     }
     [HideInInspector] public int xPos = 0;
     [HideInInspector] public int yPos = 0;
+    [HideInInspector] public Vector2Int Pos
+	{
+        get { return new Vector2Int(xPos,yPos); }
+        set { xPos = value.x; yPos = value.y; }
+	}
+
     [HideInInspector] public bool swappable;
-
-
 
     #endregion
 
@@ -80,8 +90,6 @@ public class UnitController : MonoBehaviour
     private void Awake()
     {
         anim = this.GetComponent<Animator>();
-
-        anim.SetBool("isIdle", true);
         swappable = true;
         isIdle = true;
     }
@@ -90,35 +98,42 @@ public class UnitController : MonoBehaviour
         //smoke effects
         //play summon animation
         //sfx
-        transform.position = new Vector3(pg.cols[xDestination].position.x, pg.rows[yDestination].position.y, 0);
+        transform.position = new Vector2(pg.cols[xDestination].position.x, pg.rows[yDestination].position.y);
         pg.GridArray[xDestination, yDestination] = this;
         xPos = xDestination;
         yPos = yDestination;
     }
 
-    public UnitController Move(int xDestination, int yDestination)
+    public void Move(Action OnMoveCompleteCallback)
     {
-        return Internal_Move(xDestination, yDestination, null);
+        Internal_Move(xPos, yPos,OnMoveCompleteCallback);
     }
-    public UnitController Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    public void Move()
     {
-        return Internal_Move(xDestination, yDestination, OnMoveCompleteCallback);
+        Internal_Move(xPos, yPos, null);
     }
-    public UnitController Move(Vector2Int Destination)
+
+    //anim move is used when units go on top of each other.
+    public void AnimationMove(int xDestination, int yDestination)
+	{
+        Internal_Move(xDestination, yDestination, null);
+	}
+    public void AnimationMove(int xDestination, int yDestination, Action OnMoveCompleteCallback)
     {
-        return Internal_Move(Destination.x, Destination.y, null);
-    }
-    public UnitController Move(Vector2Int Destination, Action OnMoveCompleteCallback)
-    {
-        return Internal_Move(Destination.x, Destination.y, OnMoveCompleteCallback);
+        Internal_Move(xDestination, yDestination, OnMoveCompleteCallback);
+
     }
 
     //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
-    UnitController Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    void Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
     {
         anim.SetBool("isMove", true);
 
-        Vector3 Destination = new Vector3(pg.cols[xDestination].position.x, pg.rows[yDestination].position.y, 0);
+        float xTarget = pg.cols[xDestination].position.x;
+        float yTarget = pg.rows[yDestination].position.y;
+
+        print(string.Format("x: {0}, y: {1}", xPos, yPos));
+        Vector2 Destination = new Vector2(xTarget, yTarget);
         float xflip = this.transform.localScale.x;
 
         //note: not sure if I need this. Makes speed the same even if travel distance is bigger
@@ -135,7 +150,7 @@ public class UnitController : MonoBehaviour
         }
         */
         }
-        if (xDestination < xPos)
+        if (xTarget < transform.position.x)
         {
             xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y); //flip when going back
@@ -149,19 +164,7 @@ public class UnitController : MonoBehaviour
             
             OnMoveCompleteCallback?.Invoke();
         });
-
-       
-        //temp = x
-        //x = y
-        //y = temp
-        UnitController secondaryUnit = pg.GridArray[xDestination, yDestination];
-        pg.GridArray[xDestination, yDestination] = this;
-        xPos = xDestination;
-        yPos = yDestination;
-
         //todo: update grid array via event so that not every unit has reference to pg?
-
-        return secondaryUnit;
     }
 
     public void RemoveUnit()

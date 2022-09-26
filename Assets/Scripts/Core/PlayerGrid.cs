@@ -55,10 +55,9 @@ public partial class PlayerGrid : MonoBehaviour
 
         GameManager.i.OnDoubleCursorSwap += DoubleCursorSwap;
 
-
+        GameManager.i.OnMoreButtonCursorSwap += MoreButtonsSwap;
         GameManager.i.OnAttackCreated += Attack_Created;
         GameManager.i.OnAttackCombine += Attack_Combine;
-        GameManager.i.OnMoreButtonCursorSwap += MoreButtonsSwap;
         GameManager.i.OnShieldCreated += Shield_Created;
     }
 
@@ -67,7 +66,6 @@ public partial class PlayerGrid : MonoBehaviour
         if (playerTag == this.tag)
         {
             UnitController unit = this.GridArray[xPos, yPos];
-            UnitController secondaryUnit = null;
 
             if (unit == null)
 			{
@@ -77,36 +75,73 @@ public partial class PlayerGrid : MonoBehaviour
                 return;
 			}
 
-            //broken: unit move still gets called if unit is good but secondary is null;
             switch (currentDirection)
             {
                 case Direction.Down:
-                    secondaryUnit = unit.Move(xPos, yPos + 1);
+                    SwapInGridOnly(xPos, yPos, xPos, yPos + 1);
                     break;
                 case Direction.Right:
-                    secondaryUnit = unit.Move(xPos + 1, yPos);
+                    SwapInGridOnly(xPos, yPos, xPos + 1, yPos);
                     break;
                 case Direction.Up:
-                    secondaryUnit = unit.Move(xPos, yPos - 1);
+                    SwapInGridOnly(xPos, yPos, xPos, yPos - 1);
                     break;
                 case Direction.Left:
-                    secondaryUnit = unit.Move(xPos - 1, yPos);
+                    SwapInGridOnly(xPos, yPos, xPos - 1, yPos);
                     break;
             }
+        }
+    }
 
-            if (secondaryUnit == null)
-			{
-                //swap failed
-                //fire event
-                GameManager.i.SwapFailed();
-                return;
-            }
+    void SwapInGridOnly (UnitController unitToMove, int xDestination, int yDestination)
+	{
+        SwapInGridOnly(unitToMove.xPos, unitToMove.yPos, xDestination, yDestination);
+	}
 
-            secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
-            MoveHappened(new List<UnitController> { unit, secondaryUnit });
+    List<UnitController> toBeMoved = new List<UnitController>();
+    //todo: Refactor all this !!!!
+    void SwapInGridOnly(int x1, int y1, int x2, int y2)
+    {
+        //print(string.Format("x1:{0},y1:{1},x2:{2},y2:{3}", x1, y1, x2, y2));
+
+        if (GridArray[x2, y2] == null || !GridArray[x2, y2].swappable)
+        {
+            //secondary is null
+            //swap failed
+            //fire event
+            Debug.LogWarning("failed to swap");
+            GameManager.i.SwapFailed();
+            return;
         }
 
-        
+        //swaps data in unit1 of gridArray to unit2 and viceversa.
+        //doesn't actually move yet
+
+        //optimization: the set gridPos is the uggliest thing possible OMG
+        UnitController temp = GridArray[x1, y1];
+        GridArray[x1, y1] = GridArray[x2, y2];
+        GridArray[x2, y2] = temp;
+
+        Vector2Int tempV = GridArray[x1, y1].Pos;
+        GridArray[x1, y1].Pos = GridArray[x2, y2].Pos;
+        GridArray[x2, y2].Pos = tempV;
+
+        //print(string.Format("({0},{1}),({2},{3})", GridArray[x1, y1].xPos, GridArray[x1, y1].yPos, GridArray[x2, y2].xPos, GridArray[x2, y2].yPos));
+
+        //adds both to list to be moved later
+        toBeMoved.Add(GridArray[x1, y1]);
+        toBeMoved.Add(GridArray[x2, y2]);
+
+        //print(toBeMoved.Count);
+
+
+        needsMoveUpdating = true;
+    }
+    bool needsMoveUpdating = false;
+
+    void SwapInGridOnly(Vector2Int unit1, Vector2Int unit2)
+	{
+        SwapInGridOnly(unit1.x, unit1.y, unit2.x, unit2.y);
     }
 
     public void MoreButtonsSwap (string playerTag, int xPos, int yPos, Vector2 swapDirection)
@@ -114,10 +149,8 @@ public partial class PlayerGrid : MonoBehaviour
         if (playerTag == this.tag)
         {
             UnitController unit = this.GridArray[xPos, yPos];
-            UnitController secondaryUnit = null;
 
             //todo: if unit/secondary are not swappable : swap failed.
-
             if (unit == null || !unit.swappable)
             {
                 //swap failed
@@ -127,56 +160,26 @@ public partial class PlayerGrid : MonoBehaviour
                 return;
             }
 
-            Vector2Int moveToSpace;
-
-            //broken: unit move still gets called if unit is good but secondary is null;
             if (swapDirection == Vector2.down && yPos < GridHeight - 1)
             {
-                moveToSpace = new Vector2Int(xPos, yPos + 1);
+                SwapInGridOnly(xPos, yPos, xPos, yPos + 1);
             }
             else if (swapDirection == Vector2.right && xPos < GridWidth - 1)
             {
-                moveToSpace = new Vector2Int(xPos + 1, yPos);
+                SwapInGridOnly(xPos, yPos, xPos + 1, yPos);
             }
             else if (swapDirection == Vector2.up && yPos > 0)
             {
-                moveToSpace = new Vector2Int(xPos, yPos - 1);
-            }
+                SwapInGridOnly(xPos, yPos, xPos, yPos - 1);
+			}
             else if (swapDirection == Vector2.left && xPos > MinColumn)
             {
-                moveToSpace = new Vector2Int(xPos - 1, yPos);
+                SwapInGridOnly(xPos, yPos, xPos - 1, yPos);
             }
             else
             {
                 return; // doesn't run if OOB
             }
-
-            secondaryUnit = GridArray[moveToSpace.x, moveToSpace.y];
-
-            /*if (yPos > 0 &&
-                xPos < GridWidth - 1 &&
-                yPos < GridHeight - 1 && 
-                xPos > MinColumn)
-			{
-                moveToSpace = swapDirection + new Vector2Int(xPos, yPos);
-                secondaryUnit = GridArray[moveToSpace.x, moveToSpace.y];
-			}
-            else { return; }*/
-
-            //unit.Move(xPos + (int)swapDirection.x, yPos - (int)swapDirection.y);
-
-            if (secondaryUnit == null || !secondaryUnit.swappable)
-            {
-                //swap failed
-                //fire event
-                GameManager.i.SwapFailed();
-                return;
-            }
-
-            secondaryUnit = unit.Move(moveToSpace);
-
-            secondaryUnit.Move(xPos, yPos); //swaps secondary to current pos
-            MoveHappened(new List<UnitController> { unit, secondaryUnit });
         }
     }
 
@@ -228,7 +231,6 @@ public partial class PlayerGrid : MonoBehaviour
 
     void MoveRowMulti(List<int> rows, int pulledFrom, int destination, Action OnMoveCompleteCallback)
 	{
-
         //print(String.Format("bot: {0}, top: {1}",bottomRow, topRow));
 
         for (int i = 0; i <= rows.Count - 1; i++)
@@ -243,17 +245,14 @@ public partial class PlayerGrid : MonoBehaviour
 	{
         //print(string.Format("rows: {0}, pulled: {1}, dest: {2}" , row, pulledFrom, destination));
 
-        List<UnitController> toBeChecked = new List<UnitController>();
 
         if (pulledFrom > destination && pulledFrom <= GridWidth - 1) //pull from right
         {
             //needs to move from left most not right most
             for (int i = pulledFrom; i <= GridWidth - 1; i++)
             {
-                GridArray[i, row].Move(i - 1, row);
-
+                SwapInGridOnly(i, row, i - 1, row);
                 //todo: only on certain conditions add to toBeChecked
-                toBeChecked.Add(GridArray[i - 1, row]);
             }
         }
         //optimization: super messy can be cleaned. Maybe get rid of "destination"?
@@ -263,22 +262,17 @@ public partial class PlayerGrid : MonoBehaviour
             {
                 if (pulledFrom - i >= 0) //in array bounds
                 {
-                    //note: why is that null and not sending null error?
-                    GridArray[pulledFrom - i, row].Move(destination - i, row);
+                    SwapInGridOnly(pulledFrom - i, row, destination - i, row);
                 }
                 else //pulling from queue
                 {
                     AddToQueue(row);
-                    GridArray[0, row].Move(destination - i, row);
+                    SwapInGridOnly(0, row, destination - i, row);
                 }
-
                 //todo: more specific with which get added
-                toBeChecked.Add(GridArray[destination - i, row]);
             }
         }
         else if (pulledFrom == destination) { throw new System.Exception(string.Format("pulledFrom == destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
-
-        MoveHappened(toBeChecked);
     }
 
     public void MoveRow(int row, int pulledFrom, int destination)
@@ -299,7 +293,7 @@ public partial class PlayerGrid : MonoBehaviour
         } while (AdjacentMatches(row, rng));
 
         UnitController uc = CreateUnit(rng, row);
-        uc.Move(0, row);
+        uc.AnimationMove(0, row);
     }
 
     //qa check: don'i know if this works properly right now. Might be messed up from the artifacting glitch
@@ -382,36 +376,21 @@ public partial class PlayerGrid : MonoBehaviour
         return uc;
     }
 
-    List<UnitController> toBeChecked = new List<UnitController>();
-
     //todo: toBeChecked of tobechecked but somehow say which directions are valid or not??? like toBeChecked vs toBeChecked only vertically.
     //essentially trying to store which ones in the check algorithm can skip certain parts
 
-    bool wasMoved = false;
-    void MoveHappened(List<UnitController> toBeAdded)
-    {
-        foreach (UnitController item in toBeAdded)
-        {
-            if (item == null)
-            {
-                Debug.LogError("problem: item from move happened is null.\n" +
-					"wrong call from move(s)");
-                continue;
-            }
-            toBeChecked.Add(item);
-        }
-        wasMoved = true;
-    }
-
     private void LateUpdate()
     {
-        if (wasMoved)
-        {
-            MatchCheck(toBeChecked);
-
-            toBeChecked.Clear();
-            wasMoved = false;
-        }
+        if (needsMoveUpdating)
+		{
+            foreach (UnitController unit in toBeMoved)
+			{
+                unit.Move();
+			}
+            MatchCheck(toBeMoved);
+            needsMoveUpdating = false;
+            toBeMoved.Clear();
+		}
     }
 
     //calls for each moved unit
@@ -432,26 +411,26 @@ public partial class PlayerGrid : MonoBehaviour
             int x = checking.xPos;
             int y = checking.yPos;
 
-            UnitController movedUnit = checking.pg.GridArray[x, y];
+            UnitController movedUnit = GridArray[x, y];
             UnitController nextUnit;
 
             for (int left = -1; left - MinColumn >= -x; left--)
             {
-                nextUnit = checking.pg.GridArray[x + left, y];
+                nextUnit = GridArray[x + left, y];
                 if (nextUnit == null) break;
                 if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
                 else break;
             }
             for (int up = -1; up >= -y; up--)
             {
-                nextUnit = checking.pg.GridArray[x, y + up];
+                nextUnit = GridArray[x, y + up];
                 if (nextUnit == null) break;
                 if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
                 else break;
             }
             for (int right = 1; right <= GridWidth - 1 - x; right++)
             {
-                nextUnit = checking.pg.GridArray[x + right, y];
+                nextUnit = GridArray[x + right, y];
                 if (nextUnit == null) break;
                 if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
                 else break;
@@ -459,7 +438,7 @@ public partial class PlayerGrid : MonoBehaviour
 
             for (int down = 1; down <= GridHeight - 1 - y; down++)
             {
-                nextUnit = checking.pg.GridArray[x, y + down];
+                nextUnit = GridArray[x, y + down];
                 if (nextUnit == null) break;
                 if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
                 else break;
@@ -489,6 +468,7 @@ public partial class PlayerGrid : MonoBehaviour
                 UnitShieldInfo info = new UnitShieldInfo(shielders[0].xPos, rows, shielders, this);
                 //StartCoroutine(GameManager.i.Shield_Created(info));
                 StartCoroutine(Shield_Created(info));
+                
 
                 print(output);
             }
@@ -522,8 +502,8 @@ public partial class PlayerGrid : MonoBehaviour
         /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
         add delay for each shield/attack fusion and movement animation*/
     }
-
     int RandomUnitIndex () => UnityEngine.Random.Range(0, availableSmallUnits.Length);
+
 
     //aesthetic: shield animate
     //todo: move to unit actions and do dependcy magic 
@@ -538,14 +518,14 @@ public partial class PlayerGrid : MonoBehaviour
             {
                 shielder.swappable = false;
                 shielder.isShield = true;
-                //info.shielders[i].anim.SetBool("isShield", true);
+                //creates shield event
 
                 var (doesShieldExist, col) = Shield_ExistCheck(shielder.yPos, shielder.xPos);
                 if (doesShieldExist)
                 {
                     print("shield exists");
                     Shield_GridRearrange(info, true);  //Grid after fuse 
-                    shielder.Move(col, shielder.yPos, () =>
+                    shielder.AnimationMove(col, shielder.yPos, () =>
 					{
                         //"shield fuse event"
                         shielder.RemoveFromGrid();
@@ -556,32 +536,29 @@ public partial class PlayerGrid : MonoBehaviour
 				{
                     print("shield no thereldkdofkj");
 
-                    Shield_GridRearrange(info, false); //Grid after create
-                    shielder.Move(GridWidth - 1, shielder.yPos, () =>
+                    //Shield_GridRearrange(info, false); //Grid after create
+
+                    MoveToFront(shielder.xPos, shielder.yPos);
+                    
+                    //todo: make "SwapInGridOnly" have callbacks
+                    //shielder.AnimationMove(GridWidth - 1, shielder.yPos,
+                    /*() =>
                     {
                         //"shield create event"
                         
                         //Destroy(shielder.gameObject);
 
                         //todo: array for multirow instead of extremes
-                    });
+                    });*/
                 }
             }
         }
     }
-
-    void Shield_MoveToFront (UnitShieldInfo info)
+    void MoveToFront (int start_x, int start_y)
 	{
-        foreach (UnitController shielder in info.shielders)
-        {
-            shielder.Move(GridWidth - 1, shielder.yPos, () =>
-            {
-                shielder.swappable = false;
-                shielder.isShield = true;
-            }); //move to front
-        }
+        for (int i = GridWidth - 1; i > start_x; i--)
+            SwapInGridOnly(start_x, start_y, i, start_y);
     }
-
 	void Shield_GridRearrange(UnitShieldInfo info, bool fromFuse)
 	{
         int colModifier = fromFuse ? -1 : 1; //if from a fuse pulls left else pull right
@@ -617,7 +594,7 @@ public partial class PlayerGrid : MonoBehaviour
  
         for (int i = 1; i < attackers.Count; i++)
 		{
-            attackers[i].Move(attackers[0].xPos, attackers[0].yPos, () =>
+            attackers[i].AnimationMove(attackers[0].xPos, attackers[0].yPos, () =>
 			{
                 for (int i = 1; i < attackers.Count; i++) 
                 {
@@ -635,7 +612,7 @@ public partial class PlayerGrid : MonoBehaviour
                     //fuse to existing attack and move grid accordingly
                     //FuseToExistingAttack(info.attackers[0], addedShieldCol);
                     UnitController addedAttack = info.attackers[0];
-                    addedAttack.Move(col, addedAttack.yPos, () => {
+                    addedAttack.AnimationMove(col, addedAttack.yPos, () => {
                         //"fuse event"
                         addedAttack.RemoveFromGrid();
 
@@ -647,12 +624,15 @@ public partial class PlayerGrid : MonoBehaviour
                 {
                     print("attack no exists");
 
-                    attackers[0].Move(GridWidth - 1, attackers[0].yPos, () => //moves to front
+                    attackers[0].AnimationMove(GridWidth - 1, attackers[0].yPos, () => //moves to front
                     {
+                        MoveToFront(attackers[0].xPos, attackers[0].yPos);
+                        //PullRow from left
+
 						//hold event
 						attackers[0].isAttack = true;
                     });
-                    Attack_GridRearrange(info, false);
+                    //Attack_GridRearrange(info, false);
                 }
             });
 		}
