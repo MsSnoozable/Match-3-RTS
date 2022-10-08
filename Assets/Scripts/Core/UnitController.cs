@@ -106,33 +106,38 @@ public class UnitController : MonoBehaviour
 
     public void Move(Action OnMoveCompleteCallback)
     {
-        Internal_Move(xPos, yPos,OnMoveCompleteCallback);
+        Internal_Move(xPos, yPos, OnMoveCompleteCallback, null, -1);
     }
     public void Move()
     {
-        Internal_Move(xPos, yPos, null);
+        Internal_Move(xPos, yPos, null, null, -1);
     }
 
     //anim move is used when units go on top of each other.
     public void AnimationMove(int xDestination, int yDestination)
 	{
-        Internal_Move(xDestination, yDestination, null);
+        Internal_Move(xDestination, yDestination, null, null, -1);
 	}
     public void AnimationMove(int xDestination, int yDestination, Action OnMoveCompleteCallback)
     {
-        Internal_Move(xDestination, yDestination, OnMoveCompleteCallback);
+        Internal_Move(xDestination, yDestination, OnMoveCompleteCallback, null, -1);
+
+    }
+    public void AnimationMove(int xDestination, int yDestination, int iterator, Action<int> OnMoveCompleteCallback)
+    {
+        Internal_Move(xDestination, yDestination, null, OnMoveCompleteCallback, iterator); 
 
     }
 
-    //todo: maybe pass in a function as a parameter so you callback oncomplete instead of checking the move duration.???
-    void Internal_Move(int xDestination, int yDestination, Action OnMoveCompleteCallback)
+    //todo: make multiple actions and only call one if it's not not null... not the best but it works
+    void Internal_Move(int xDestination, int yDestination, Action DefaultAction, Action<int> AttackAction, int i)
     {
         anim.SetBool("isMove", true);
 
         float xTarget = pg.cols[xDestination].position.x;
         float yTarget = pg.rows[yDestination].position.y;
 
-        print(string.Format("x: {0}, y: {1}", xPos, yPos));
+        //print(string.Format("x: {0}, y: {1}", xPos, yPos));
         Vector2 Destination = new Vector2(xTarget, yTarget);
         float xflip = this.transform.localScale.x;
 
@@ -161,14 +166,16 @@ public class UnitController : MonoBehaviour
 
             if (xflip < 0) xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y);
-            
-            OnMoveCompleteCallback?.Invoke();
+
+            DefaultAction?.Invoke();
+            AttackAction?.Invoke(i);
         });
+
         //todo: update grid array via event so that not every unit has reference to pg?
     }
-
     public void RemoveUnit()
     {
+        this.RemoveFromGrid();
         pg.MoveRow(yPos, xPos - 1, xPos);
         Destroy(this.gameObject);
     }

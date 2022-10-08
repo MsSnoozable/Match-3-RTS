@@ -82,6 +82,11 @@ public abstract class CursorScript : MonoBehaviour
 		}
 	}
 
+	public void DeleteUnit (InputAction.CallbackContext context)
+	{
+		pg.GridArray[xPos, yPos].RemoveUnit();
+	}
+
 	public void MinorAbility(InputAction.CallbackContext context)
 	{
 		if (context.performed)

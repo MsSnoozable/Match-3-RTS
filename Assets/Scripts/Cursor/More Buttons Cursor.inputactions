@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Delete Unit",
+                    "type": "Button",
+                    "id": "028d8dd2-9485-41a2-a593-014908c04fbd",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -194,6 +203,17 @@
                     "action": "Swapping",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "4688fe9c-f9cc-497d-9a5f-7b4503b4ac29",
+                    "path": "<Keyboard>/f3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Delete Unit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
