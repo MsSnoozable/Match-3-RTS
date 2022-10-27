@@ -10,7 +10,7 @@ public abstract class UnitData : ScriptableObject
 	public unitColors color;
 	public unitType type;
 	public unitRange range;
-	public readonly static float moveDuration = 0.5f;
+	public readonly static float moveDuration = 1.5f;
 	public readonly static float attackFusionDelay = 0.01f;
 
 	#endregion
@@ -28,4 +28,12 @@ public abstract class UnitData : ScriptableObject
 	public static bool operator == (UnitData a, UnitData b) => a.color == b.color && a.type == b.type;
 
 	public static bool operator != (UnitData a, UnitData b) => a.color != b.color || a.type != b.type;
+	public override bool Equals(object other)
+	{
+		return base.Equals(other);
+	}
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
 }
