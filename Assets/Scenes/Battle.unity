@@ -6130,5 +6130,13 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964721, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: availableSmallUnits.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543335997775964721, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}
+      propertyPath: availableSmallUnits.Array.data[2]
+      value: 
+      objectReference: {fileID: 4105362945620786469, guid: 0e434b0791033684e8a9f71a4f103c4c, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 99df226b43dd94c40a8e37eb9f27fb2b, type: 3}

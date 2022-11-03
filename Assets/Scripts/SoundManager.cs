@@ -29,17 +29,16 @@ public class SoundManager : MonoBehaviour
 		 
 	}
 
-	IEnumerator AttackCreatedSound (UnitAttackInfo info)
+	void AttackCreatedSound (UnitAttackInfo info)
 	{
 		if (info.pg.tag == this.tag)
 		{
-			yield return null;
+
 		}
 	}
 
-	IEnumerator ShieldCreatedSound (UnitShieldInfo info)
+	void ShieldCreatedSound (UnitShieldInfo info)
 	{
-		yield return null;
 		if (info.pg.tag == this.tag)
 		{
 			switch (info.shielders.Count)

@@ -46,12 +46,12 @@ public class GameManager : MonoBehaviour
 	public event Action<String, int, int, Vector2> OnMoreButtonCursorSwap;
 	public event Action OnSwapFailed;
 
-	public event Func<UnitAttackInfo, IEnumerator> OnAttackCreated;
+	public event Action<UnitAttackInfo> OnAttackCreated;
 	public event Action<UnitAttackInfo> OnAttackCombine;
 	public event Action<UnitAttackInfo> OnAttackFuse;
 	public event Action<UnitAttackInfo> OnAttackHold;
 
-	public event Func<UnitShieldInfo, IEnumerator> OnShieldCreated;
+	public event Action<UnitShieldInfo> OnShieldCreated;
 	public event Action<UnitShieldInfo> OnShieldFusion;
 	public event Action<UnitShieldInfo> OnShieldHold;
 
@@ -59,12 +59,12 @@ public class GameManager : MonoBehaviour
 	public void MoreButtonsCursorSwap(String playerTag, int xPos, int yPos, Vector2 swapDirection) => OnMoreButtonCursorSwap?.Invoke(playerTag, xPos, yPos, swapDirection);
 	public void SwapFailed() => OnSwapFailed?.Invoke();
 
-	public IEnumerator AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
+	public void AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
 	public void AttackCombine(UnitAttackInfo attackInfo) => OnAttackCombine?.Invoke(attackInfo);
 	public void AttackHold(UnitAttackInfo attackInfo) => OnAttackHold?.Invoke(attackInfo);
 	public void AttackFuse(UnitAttackInfo attackInfo) => OnAttackFuse?.Invoke(attackInfo);
 
-	public IEnumerator ShieldCreated(UnitShieldInfo shieldInfo) => OnShieldCreated?.Invoke(shieldInfo);
+	public void ShieldCreated(UnitShieldInfo shieldInfo) => OnShieldCreated?.Invoke(shieldInfo);
 	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
 	public void ShieldHold(UnitShieldInfo shieldInfo) => OnShieldHold?.Invoke(shieldInfo);
 

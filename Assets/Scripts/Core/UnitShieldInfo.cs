@@ -8,10 +8,32 @@ public class UnitShieldInfo : UnitFormationInfo
 	public List<UnitController> shielders;
 
 
-	public UnitShieldInfo(int col, List<int> rows, List<UnitController> shielders, PlayerGrid pg) : base(pg)
+	public UnitShieldInfo(List<UnitController> shielders, PlayerGrid pg) : base(pg)
 	{
-		this.col = col;
+		List<int> rows = new List<int>();
+
+		foreach (UnitController uc in shielders)
+		{
+			rows.Add(uc.yPos);
+		}
+
+		this.col = shielders[0].xPos;
 		this.rows = rows;
 		this.shielders = shielders;
+		this.fromSwap = true;
+	}
+	public UnitShieldInfo(List<UnitController> shielders, PlayerGrid pg, bool fromSwap) : base(pg)
+	{
+		List<int> rows = new List<int>();
+
+		foreach (UnitController uc in shielders)
+		{
+			rows.Add(uc.yPos);
+		}
+
+		this.col = shielders[0].xPos;
+		this.rows = rows;
+		this.shielders = shielders;
+		this.fromSwap = fromSwap;
 	}
 }

@@ -6,17 +6,6 @@ using UnityEngine.InputSystem;
 
 public class MoreButtonsCursor : CursorScript
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     [SerializeField] private GameObject leftAddon;
     [SerializeField] private GameObject rightAddon;
     [SerializeField] private GameObject topAddon;
@@ -37,7 +26,102 @@ public class MoreButtonsCursor : CursorScript
         if (yPos == PlayerGrid.GridHeight - 1) bottomAddon.SetActive(false);
         else bottomAddon.SetActive(true);
     }
+    bool inUpDownBounds() => yPos > 0  && yPos < PlayerGrid.GridHeight - 1;
+    bool inLeftRightBounds() => xPos > PlayerGrid.MinColumn && xPos < PlayerGrid.GridWidth - 1;
+    bool inBounds() => inUpDownBounds() && inLeftRightBounds();
 
+    public override void QuickAttack (InputAction.CallbackContext context)
+	{
+        if (context.started)
+        {
+            if (inLeftRightBounds())
+            {
+                List<UnitController> attackers = new List<UnitController>();
+                for (int i = -1; i <= 1; i++)
+                    attackers.Add(pg.GridArray[xPos + i, yPos]);
+
+                //swap so middle is where the others move into
+                UnitController temp = attackers[0];
+                attackers[0] = attackers[1];
+                attackers[1] = temp;
+
+                UnitAttackInfo info = new UnitAttackInfo(yPos, attackers, pg, false);
+                pg.StartAttackSequence(info);
+            }
+            else
+            {
+                //swap fail sound
+            }
+        }
+    }
+
+    public override void RotateAbility (InputAction.CallbackContext context)
+	{
+        if (context.started)
+        {
+            if (inBounds())
+			{
+                Vector2Int left = new Vector2Int (xPos - 1 , yPos);
+                Vector2Int right = new Vector2Int (xPos + 1 , yPos);
+                Vector2Int up = new Vector2Int (xPos, yPos + 1);
+                Vector2Int down = new Vector2Int (xPos, yPos - 1);
+
+                pg.SwapInGridOnly(left, up);
+                pg.SwapInGridOnly(left, right);
+                pg.SwapInGridOnly(left, down);
+			}
+            else
+			{
+                //swap failed
+			}
+        }
+    }
+
+    public override void BoltAttack(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            if (inBounds())
+			{
+                List<UnitController> attackers = new List<UnitController>();
+                for (int i = -1; i <= 1; i++)
+                     attackers.Add(pg.GridArray[xPos + i, yPos]);
+                attackers.Add(pg.GridArray[xPos, yPos + 1]); //up
+                attackers.Add(pg.GridArray[xPos, yPos - 1]); //down
+
+                //swap so middle is where the others move into
+                UnitController temp = attackers[0];
+                attackers[0] = attackers[1];
+                attackers[1] = temp;
+
+                UnitAttackInfo info = new UnitAttackInfo(yPos, attackers, pg, false);
+                pg.StartAttackSequence(info);
+            }
+            else
+            {
+                //swap fail sound
+            }
+        }
+    }
+    public override void QuickShield(InputAction.CallbackContext context) {
+        if (context.started)
+        {
+            if (inUpDownBounds())
+            {
+                List<UnitController> shielders = new List<UnitController>();
+                for (int i = -1; i <= 1; i++)
+                {
+                    shielders.Add(pg.GridArray[xPos, yPos + i]);
+                }
+                UnitShieldInfo info = new UnitShieldInfo(shielders, pg, false);
+                pg.StartShieldSequence(info);
+            }
+            else
+			{
+                //swap fail sound
+			}
+        }
+    }
     public override void Swapping(InputAction.CallbackContext context)
     {
         if (context.performed)

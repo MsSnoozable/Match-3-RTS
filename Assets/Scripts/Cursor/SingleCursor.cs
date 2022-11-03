@@ -23,4 +23,24 @@ public class SingleCursor : CursorScript
 		throw new System.NotImplementedException();
 
 	}
+
+	public override void QuickAttack(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void QuickShield(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void BoltAttack(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void RotateAbility(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
 }

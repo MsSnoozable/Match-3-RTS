@@ -5,6 +5,7 @@ using UnityEngine;
 public class UnitFormationInfo
 {
 	public PlayerGrid pg;
+	public bool fromSwap;
     public UnitFormationInfo (PlayerGrid pg)
 	{
 		this.pg = pg;

@@ -90,6 +90,11 @@ public abstract class CursorScript : MonoBehaviour
 		}
 	}
 
+	public abstract void QuickAttack(InputAction.CallbackContext context);
+	public abstract void QuickShield(InputAction.CallbackContext context);
+	public abstract void BoltAttack(InputAction.CallbackContext context);
+	public abstract void RotateAbility(InputAction.CallbackContext context);
+
 	public void MinorAbility(InputAction.CallbackContext context)
 	{
 		if (context.performed)

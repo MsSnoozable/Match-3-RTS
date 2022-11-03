@@ -486,6 +486,70 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 028d8dd2-9485-41a2-a593-014908c04fbd
     m_ActionName: In Game Cursor/Delete Unit[/Keyboard/f3]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5083479231287175109}
+        m_TargetAssemblyTypeName: MoreButtonsCursor, Cursor
+        m_MethodName: QuickAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 111d3a71-281e-4bd1-bb4a-7a07c3fe4565
+    m_ActionName: In Game Cursor/Quick Attack[/Keyboard/f4]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5083479231287175109}
+        m_TargetAssemblyTypeName: MoreButtonsCursor, Cursor
+        m_MethodName: QuickShield
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ebba1b22-5888-4974-aa3f-40e20553ff57
+    m_ActionName: In Game Cursor/Quick Shield[/Keyboard/f5]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5083479231287175109}
+        m_TargetAssemblyTypeName: MoreButtonsCursor, Cursor
+        m_MethodName: BoltAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 56ab6f71-9a6a-4c90-b091-e45f8b5790fe
+    m_ActionName: In Game Cursor/New action
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5083479231287175109}
+        m_TargetAssemblyTypeName: MoreButtonsCursor, Cursor
+        m_MethodName: RotateAbility
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9ec85895-3458-47f3-88d4-438bd74981a0
+    m_ActionName: In Game Cursor/Rotate Ability[/Keyboard/2]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: In Game Cursor

@@ -58,6 +58,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Quick Attack",
+                    "type": "Button",
+                    "id": "111d3a71-281e-4bd1-bb4a-7a07c3fe4565",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Quick Shield",
+                    "type": "Button",
+                    "id": "ebba1b22-5888-4974-aa3f-40e20553ff57",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Bolt Attack",
+                    "type": "Button",
+                    "id": "56ab6f71-9a6a-4c90-b091-e45f8b5790fe",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Rotate Ability",
+                    "type": "Button",
+                    "id": "9ec85895-3458-47f3-88d4-438bd74981a0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -212,6 +248,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "Delete Unit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1d994963-84eb-4fad-820d-7dd06f3eeb16",
+                    "path": "<Keyboard>/f4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Quick Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fc3da19b-89ff-4725-aa14-c00e0d4f5166",
+                    "path": "<Keyboard>/f5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Quick Shield",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0b9aa7e6-9203-43a7-b38c-b5bd99f41720",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Bolt Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f81ee964-e1a6-449a-9f0a-b81fc5aec24a",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rotate Ability",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -10,6 +10,8 @@ public class DoubleCursorScript : CursorScript
 
 	Transform secondaryCursor;
 
+	
+
 	private void Start()
 	{
 		currentDirection = Direction.Down;
@@ -115,5 +117,25 @@ public class DoubleCursorScript : CursorScript
 		transform.DOMove(new Vector2(
 			pg.cols[xPos].position.x,
 			pg.rows[yPos].position.y), moveDuration).SetEase(Ease.OutCirc);
+	}
+
+	public override void QuickAttack(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void QuickShield(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void BoltAttack(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public override void RotateAbility(InputAction.CallbackContext context)
+	{
+		throw new System.NotImplementedException();
 	}
 }

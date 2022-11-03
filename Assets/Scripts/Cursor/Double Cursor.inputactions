@@ -76,6 +76,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Quick Attack",
+                    "type": "Button",
+                    "id": "b3f66d1c-9584-447b-ad91-3f83414f44ec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Quick Shield",
+                    "type": "Button",
+                    "id": "8b1fda3b-13e5-4fcf-83ca-9e8ee367c144",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Bolt Attack",
+                    "type": "Button",
+                    "id": "c02fcdac-75eb-46f2-8d33-eb7a3bc696f1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -241,6 +268,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Delete Unit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10603d57-9d1f-4064-bb60-578ef96aef28",
+                    "path": "<Keyboard>/f4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Quick Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "911dc21c-e5ce-4ecf-960c-c15f23f2e037",
+                    "path": "<Keyboard>/f5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Quick Shield",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "55a76cd7-021b-4e1b-bdb6-938035c619f3",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Bolt Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
