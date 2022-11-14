@@ -8,6 +8,8 @@ public class UnitAttackInfo : UnitFormationInfo
 	public int rightMost;
 	public List<UnitController> attackers;
 
+	public int existingAttackCol;
+
 	public UnitAttackInfo(int row, List<UnitController> attackers, PlayerGrid pg) : base(pg)
 	{
 		int rightMost = PlayerGrid.MinColumn;
@@ -23,7 +25,7 @@ public class UnitAttackInfo : UnitFormationInfo
 		this.leftMost = leftMost;
 		this.rightMost = rightMost;
 		this.attackers = attackers;
-		this.fromSwap = true;
+		fromSwap = true;
 	}
 	public UnitAttackInfo(int row, List<UnitController> attackers, PlayerGrid pg, bool fromSwap) : base(pg)
 	{

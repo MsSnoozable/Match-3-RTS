@@ -14,11 +14,12 @@ public class testScript : StateMachineBehaviour
             //get the shield animation
             //if from added shield... add X
             //else set it's remaining time to X
+            //Debug.Log("s");
 		}
 
         if (stateInfo.IsName("Attack"))
 		{
-            Debug.Log("test");
+            //Debug.Log("a");
         }
     }
 

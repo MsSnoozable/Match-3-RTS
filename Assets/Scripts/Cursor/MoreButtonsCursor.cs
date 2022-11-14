@@ -46,7 +46,7 @@ public class MoreButtonsCursor : CursorScript
                 attackers[1] = temp;
 
                 UnitAttackInfo info = new UnitAttackInfo(yPos, attackers, pg, false);
-                pg.StartAttackSequence(info);
+                GameManager._.AttackCreated(info);
             }
             else
             {
@@ -66,9 +66,9 @@ public class MoreButtonsCursor : CursorScript
                 Vector2Int up = new Vector2Int (xPos, yPos + 1);
                 Vector2Int down = new Vector2Int (xPos, yPos - 1);
 
-                pg.SwapInGridOnly(left, up);
-                pg.SwapInGridOnly(left, right);
-                pg.SwapInGridOnly(left, down);
+                pg.MoveInGridOnly(left, up);
+                pg.MoveInGridOnly(left, right);
+                pg.MoveInGridOnly(left, down);
 			}
             else
 			{
@@ -95,7 +95,7 @@ public class MoreButtonsCursor : CursorScript
                 attackers[1] = temp;
 
                 UnitAttackInfo info = new UnitAttackInfo(yPos, attackers, pg, false);
-                pg.StartAttackSequence(info);
+                GameManager._.AttackCreated(info);
             }
             else
             {
@@ -114,7 +114,7 @@ public class MoreButtonsCursor : CursorScript
                     shielders.Add(pg.GridArray[xPos, yPos + i]);
                 }
                 UnitShieldInfo info = new UnitShieldInfo(shielders, pg, false);
-                pg.StartShieldSequence(info);
+                GameManager._.ShieldCreated(info);
             }
             else
 			{
@@ -129,7 +129,7 @@ public class MoreButtonsCursor : CursorScript
             Vector2 swapDirection = context.ReadValue<Vector2>();
 
             Vector2Int intSwapDirection = new Vector2Int((int)swapDirection.x, (int)swapDirection.y);
-            GameManager.i.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
+            GameManager._.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
         }
     }
 }

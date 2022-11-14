@@ -94,7 +94,7 @@ public class DoubleCursorScript : CursorScript
 	{
 		if (context.started)
 		{
-			GameManager.i.DoubleCursorSwap(this.tag, xPos, yPos, currentDirection);
+			GameManager._.DoubleCursorSwap(this.tag, xPos, yPos, currentDirection);
 		}
 	}
 

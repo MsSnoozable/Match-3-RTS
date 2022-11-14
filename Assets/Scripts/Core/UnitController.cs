@@ -33,6 +33,7 @@ public class UnitController : MonoBehaviour
             _isIdle = !value;
             _isAttack = value;
             _isShield = !value;
+            swappable = !value;
             anim.SetBool("isIdle", !value);
             anim.SetBool("isAttack", value);
             anim.SetBool("isShield", !value);
@@ -46,6 +47,7 @@ public class UnitController : MonoBehaviour
             _isIdle = !value;
             _isAttack = !value;
             _isShield = value;
+            swappable = !value;
             anim.SetBool("isIdle", !value);
             anim.SetBool("isAttack", !value);
             anim.SetBool("isShield", value);
@@ -60,6 +62,7 @@ public class UnitController : MonoBehaviour
 	}
 
     [HideInInspector] public bool swappable;
+    [HideInInspector] public bool movable;
 
     public float remainingShieldTime
 	{
@@ -91,6 +94,7 @@ public class UnitController : MonoBehaviour
     {
         anim = this.GetComponent<Animator>();
         swappable = true;
+        movable = true;
         isIdle = true;
     }
     public void Summon(int xDestination, int yDestination)
@@ -135,7 +139,7 @@ public class UnitController : MonoBehaviour
         anim.SetBool("isMove", true);
 
         //broken: switching this on and off is still kind of broken. Like it doesn't let you buffer moves
-        //swappable = false;
+        swappable = false;
 
         float xTarget = pg.cols[xDestination].position.x;
         float yTarget = pg.rows[yDestination].position.y;
@@ -171,7 +175,7 @@ public class UnitController : MonoBehaviour
             this.transform.localScale = new Vector2(xflip, transform.localScale.y);
 
             //broken: switching this on and off is still kind of broken. Like it doesn't let you buffer moves
-            //swappable = true;
+            swappable = true;
 
             DefaultAction?.Invoke();
             AttackAction?.Invoke(i);
@@ -179,7 +183,7 @@ public class UnitController : MonoBehaviour
 
         //todo: update grid array via event so that not every unit has reference to pg?
     }
-    public void RemoveUnit()
+    public void DeleteUnit()
     {
         if (pg.GridArray[xPos, yPos] != null)
         {
@@ -191,6 +195,22 @@ public class UnitController : MonoBehaviour
         else
             Debug.LogError("deleting an empty space");
     }
+    public enum ActionType
+	{
+        Attack, Shield
+	}
+    public void DeleteUnit(ActionType at)
+	{
+        if (at == ActionType.Attack)
+            GameManager._.AttackRelease(this);
+        else if (at == ActionType.Shield)
+            GameManager._.ShieldRelease(this);
+        else
+            Debug.LogError("error"); //error
+
+        DeleteUnit();
+	}
+
     //optimization: seems messy to have two versions of very similar functions... maybe consolidate
 
     public void RemoveFromGrid()

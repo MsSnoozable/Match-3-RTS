@@ -86,7 +86,7 @@ public abstract class CursorScript : MonoBehaviour
 	{
 		if (context.started && pg.GridArray[xPos, yPos] != null)
 		{
-			pg.GridArray[xPos, yPos].RemoveUnit();
+			pg.GridArray[xPos, yPos].DeleteUnit();
 		}
 	}
 

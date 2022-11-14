@@ -9,7 +9,7 @@ internal enum cursorOptions {
 
 public class GameManager : MonoBehaviour
 {
-	public static GameManager i;
+	public static GameManager _;
 
 	[HideInInspector] public PlayerStats P1;
 	[HideInInspector] public PlayerStats P2;
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
 
 	private void Awake()
 	{
-		i = this;
+		_ = this;
 		player1ChosenCursor = SetCurosrs(player1CursorMode);
 		player2ChosenCursor = SetCurosrs(player2CursorMode);
 	}
@@ -49,11 +49,16 @@ public class GameManager : MonoBehaviour
 	public event Action<UnitAttackInfo> OnAttackCreated;
 	public event Action<UnitAttackInfo> OnAttackCombine;
 	public event Action<UnitAttackInfo> OnAttackFuse;
-	public event Action<UnitAttackInfo> OnAttackHold;
+	public event Action<UnitAttackInfo> OnAttackHoldStart;
+	public event Action<UnitController> OnAttackRelease;
 
 	public event Action<UnitShieldInfo> OnShieldCreated;
 	public event Action<UnitShieldInfo> OnShieldFusion;
-	public event Action<UnitShieldInfo> OnShieldHold;
+	public event Action<UnitShieldInfo> OnShieldHoldStart;
+	public event Action<UnitController> OnShieldRelease;
+
+	[HideInInspector] public int numOfHeldShields = 0;
+	[HideInInspector] public int numOfHeldAttacks = 0;
 
 	public void DoubleCursorSwap(String playerTag, int xPos, int yPos, Direction curosrOrientation) => OnDoubleCursorSwap?.Invoke(playerTag, xPos, yPos, curosrOrientation);
 	public void MoreButtonsCursorSwap(String playerTag, int xPos, int yPos, Vector2 swapDirection) => OnMoreButtonCursorSwap?.Invoke(playerTag, xPos, yPos, swapDirection);
@@ -61,12 +66,14 @@ public class GameManager : MonoBehaviour
 
 	public void AttackCreated(UnitAttackInfo attackInfo) => OnAttackCreated?.Invoke(attackInfo);
 	public void AttackCombine(UnitAttackInfo attackInfo) => OnAttackCombine?.Invoke(attackInfo);
-	public void AttackHold(UnitAttackInfo attackInfo) => OnAttackHold?.Invoke(attackInfo);
 	public void AttackFuse(UnitAttackInfo attackInfo) => OnAttackFuse?.Invoke(attackInfo);
+	public void AttackHoldStart(UnitAttackInfo attackInfo) => OnAttackHoldStart?.Invoke(attackInfo);
+	public void AttackRelease(UnitController attack) => OnAttackRelease?.Invoke(attack);
 
+	public void ShieldHoldStart(UnitShieldInfo shieldInfo) => OnShieldHoldStart?.Invoke(shieldInfo);
 	public void ShieldCreated(UnitShieldInfo shieldInfo) => OnShieldCreated?.Invoke(shieldInfo);
 	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
-	public void ShieldHold(UnitShieldInfo shieldInfo) => OnShieldHold?.Invoke(shieldInfo);
+	public void ShieldRelease(UnitController shield) => OnShieldRelease?.Invoke(shield);
 
 
 	//todo: refactor so no return like a proper setter

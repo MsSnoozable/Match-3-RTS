@@ -7,6 +7,8 @@ public class UnitShieldInfo : UnitFormationInfo
 	public List<int> rows;
 	public List<UnitController> shielders;
 
+	public UnitController currentShield;
+	public int existingShieldCol;
 
 	public UnitShieldInfo(List<UnitController> shielders, PlayerGrid pg) : base(pg)
 	{
@@ -17,10 +19,10 @@ public class UnitShieldInfo : UnitFormationInfo
 			rows.Add(uc.yPos);
 		}
 
-		this.col = shielders[0].xPos;
+		col = shielders[0].xPos;
 		this.rows = rows;
 		this.shielders = shielders;
-		this.fromSwap = true;
+		fromSwap = true;
 	}
 	public UnitShieldInfo(List<UnitController> shielders, PlayerGrid pg, bool fromSwap) : base(pg)
 	{
@@ -31,7 +33,7 @@ public class UnitShieldInfo : UnitFormationInfo
 			rows.Add(uc.yPos);
 		}
 
-		this.col = shielders[0].xPos;
+		col = shielders[0].xPos;
 		this.rows = rows;
 		this.shielders = shielders;
 		this.fromSwap = fromSwap;
