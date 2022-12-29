@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 public abstract class CursorScript : MonoBehaviour
 {
 	#region Public Fields
-	public float moveDuration = 0;
 	public PlayerInput playerInput;
 	[HideInInspector] public PlayerGrid pg;
 	#endregion
@@ -86,7 +85,8 @@ public abstract class CursorScript : MonoBehaviour
 	{
 		if (context.started && pg.GridArray[xPos, yPos] != null)
 		{
-			pg.GridArray[xPos, yPos].DeleteUnit();
+			if (!pg.inCombo)
+				pg.GridArray[xPos, yPos].DeleteUnit();
 		}
 	}
 
@@ -118,7 +118,7 @@ public abstract class CursorScript : MonoBehaviour
 
 		transform.DOMove(new Vector2(
 			pg.cols[xPos].position.x,
-			pg.rows[yPos].position.y), moveDuration).SetEase(Ease.OutCirc);
+			pg.rows[yPos].position.y), GameManager._.cursorMoveSpeed).SetEase(Ease.OutCirc);
 	}
 
 	IEnumerator MoveFromHoldInput (Vector2 moveDirection)

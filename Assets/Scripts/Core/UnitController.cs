@@ -11,6 +11,7 @@ public class UnitController : MonoBehaviour
     public bool justMoved = false;
     [HideInInspector] public PlayerGrid pg;
     public int unitIndex; //note: might need later for more optimized randomization.
+    int unitStrength;
 
     [HideInInspector] public bool isIdle
     {
@@ -37,6 +38,8 @@ public class UnitController : MonoBehaviour
             anim.SetBool("isIdle", !value);
             anim.SetBool("isAttack", value);
             anim.SetBool("isShield", !value);
+            unitStrength = data.baseAttackStrength;
+
         }
     }
     [HideInInspector] public bool isShield
@@ -47,12 +50,36 @@ public class UnitController : MonoBehaviour
             _isIdle = !value;
             _isAttack = !value;
             _isShield = value;
-            swappable = !value;
+			swappable = !value;
+
+            unitStrength = data.baseShieldStrength;
+
+			//todo: I'm trying to make the shield set to a speicific frame based on combo.
+			if (value)
+            {
+                anim.SetBool("isShield", value);
+                float clipLength = anim.GetCurrentAnimatorClipInfo(0).Length;
+                //print(anim.GetCurrentAnimatorClipInfo(0));
+                if (clipLength > 0)
+				{
+                    anim.Play("Shield", 0, 0.5f);
+					// anim Animation["Shield"].Length???
+				}
+            }
+            else 
+
             anim.SetBool("isIdle", !value);
             anim.SetBool("isAttack", !value);
-            anim.SetBool("isShield", value);
+
         }
     }
+
+
+    IEnumerator DelayValueChange<T> (T changedVariable, T valueToChangeTo)
+	{
+        yield return new WaitForSeconds(GameManager._.unitMoveSpeed);
+
+	}
     [HideInInspector] public int xPos = 0;
     [HideInInspector] public int yPos = 0;
     [HideInInspector] public Vector2Int Pos
@@ -69,6 +96,8 @@ public class UnitController : MonoBehaviour
         get { return anim.GetFloat("remainingShieldTime"); }
         set { anim.SetFloat("remainingShieldTime", value); }
 	}
+
+    public bool queuedToBeMoved = false;
 
     #endregion
 
@@ -96,7 +125,16 @@ public class UnitController : MonoBehaviour
         swappable = true;
         movable = true;
         isIdle = true;
+
     }
+
+    private unitColors _color;
+
+    void LoadData ()
+	{
+        
+	}
+
     public void Summon(int xDestination, int yDestination)
     {
         //smoke effects
@@ -106,6 +144,8 @@ public class UnitController : MonoBehaviour
         pg.GridArray[xDestination, yDestination] = this;
         xPos = xDestination;
         yPos = yDestination;
+        UpdateName();
+
     }
 
     public void Move(Action OnMoveCompleteCallback)
@@ -114,6 +154,7 @@ public class UnitController : MonoBehaviour
     }
     public void Move()
     {
+        queuedToBeMoved = false;
         Internal_Move(xPos, yPos, null, null, -1);
     }
 
@@ -162,12 +203,12 @@ public class UnitController : MonoBehaviour
         }
         */
         }
-        if (xTarget < transform.position.x)
+        if (xTarget < xPos)
         {
             xflip *= -1;
             this.transform.localScale = new Vector2(xflip, transform.localScale.y); //flip when going back
         }
-        transform.DOMove(Destination, UnitData.moveDuration * speedMofifier).OnComplete(() =>
+        transform.DOMove(Destination, GameManager._.unitMoveSpeed * speedMofifier).OnComplete(() =>
         {
             anim.SetBool("isMove", false);
 
@@ -177,16 +218,22 @@ public class UnitController : MonoBehaviour
             //broken: switching this on and off is still kind of broken. Like it doesn't let you buffer moves
             swappable = true;
 
+            UpdateName();
+
             DefaultAction?.Invoke();
             AttackAction?.Invoke(i);
         });
 
         //todo: update grid array via event so that not every unit has reference to pg?
     }
+
+    void UpdateName () => this.gameObject.name =  "(" + xPos + ", " + yPos + ") " + data.name;
+
     public void DeleteUnit()
     {
         if (pg.GridArray[xPos, yPos] != null)
         {
+            pg.StartCoroutine(pg.PauseMove(0.2f));
             this.RemoveFromGrid();
             pg.MoveRow(yPos, xPos - 1, xPos);
             DOTween.Kill(this.transform);
@@ -199,10 +246,20 @@ public class UnitController : MonoBehaviour
 	{
         Attack, Shield
 	}
-    public void DeleteUnit(ActionType at)
-	{
+    public GameObject attackObject;
+    //need to learn: what is this exactly?
+    public void Release(ActionType at)
+    {
         if (at == ActionType.Attack)
+		{
+            GameObject aO = Instantiate(attackObject);
+            aO.transform.position = this.transform.position;
+            //todo: attackObjectInfo constructor to determine attack unitStrength
+            //for now just add a default value
+            
+            //aO unitStrength assign
             GameManager._.AttackRelease(this);
+		}
         else if (at == ActionType.Shield)
             GameManager._.ShieldRelease(this);
         else
@@ -213,9 +270,34 @@ public class UnitController : MonoBehaviour
 
     //optimization: seems messy to have two versions of very similar functions... maybe consolidate
 
-    public void RemoveFromGrid()
+    public void RemoveFromGrid() => pg.GridArray[xPos, yPos] = null;
+
+    void UpdateStrength ()
 	{
-        pg.GridArray[xPos, yPos] = null;
+
+	}
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+        GameObject hitGO = collision.gameObject;
+
+        if (hitGO.CompareTag("Attack"))
+		{
+
+            //takes damage... for now just dies
+            //attack vs unit unitStrength 
+
+            int enemyAttackStrength = hitGO.GetComponent<AttackTravel>().attackStrength;
+            if (unitStrength >= enemyAttackStrength)
+            {
+                unitStrength -= enemyAttackStrength;
+                Destroy(hitGO);
+			}
+			else
+            {
+                enemyAttackStrength -= unitStrength;
+                DeleteUnit();
+            }
+		}
 	}
 }
 

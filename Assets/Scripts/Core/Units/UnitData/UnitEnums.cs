@@ -4,7 +4,7 @@ public enum unitType
 }
 public enum unitColors
 {
-	Red, Green, Blue, Yellow, Purple
+	Red, Green, Blue, Yellow, Purple, Void
 }
 
 public enum unitRange

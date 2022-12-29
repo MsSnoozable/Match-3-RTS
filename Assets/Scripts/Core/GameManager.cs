@@ -46,16 +46,21 @@ public class GameManager : MonoBehaviour
 	public event Action<String, int, int, Vector2> OnMoreButtonCursorSwap;
 	public event Action OnSwapFailed;
 
+	//Attacks
 	public event Action<UnitAttackInfo> OnAttackCreated;
 	public event Action<UnitAttackInfo> OnAttackCombine;
 	public event Action<UnitAttackInfo> OnAttackFuse;
 	public event Action<UnitAttackInfo> OnAttackHoldStart;
 	public event Action<UnitController> OnAttackRelease;
 
+	//Shields
 	public event Action<UnitShieldInfo> OnShieldCreated;
 	public event Action<UnitShieldInfo> OnShieldFusion;
 	public event Action<UnitShieldInfo> OnShieldHoldStart;
 	public event Action<UnitController> OnShieldRelease;
+
+	public event Action<int> OnUpdateComboCount;
+	public event Action<int> OnFinalizeComboCount;
 
 	[HideInInspector] public int numOfHeldShields = 0;
 	[HideInInspector] public int numOfHeldAttacks = 0;
@@ -75,6 +80,8 @@ public class GameManager : MonoBehaviour
 	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
 	public void ShieldRelease(UnitController shield) => OnShieldRelease?.Invoke(shield);
 
+	public void UpdateComboCount(int comboCount) => OnUpdateComboCount?.Invoke(comboCount);
+	public void FinalizeComboCount (int comboCount) => OnFinalizeComboCount?.Invoke(comboCount);
 
 	//todo: refactor so no return like a proper setter
 	private GameObject SetCurosrs(cursorOptions cO)
@@ -91,6 +98,19 @@ public class GameManager : MonoBehaviour
 				return null;
 		}
 	}
+
+
+	//need to learn: might be useful as ahelper but doesn't work because ref doesn't work with
+	//coroutines....
+/*
+	public IEnumerator boolDelayFlip (ref bool var, bool value, float delayInSeconds)
+	{
+		var = value;
+		print(value);
+		yield return new WaitForSeconds(delayInSeconds);
+		var = !value;
+		print(value);
+	}*/
 
 	public GameObject GetCursor(string playerNumber) {
 		if (playerNumber == "Player 1")

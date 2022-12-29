@@ -16,3 +16,6 @@ MonoBehaviour:
   color: 3
   type: 0
   range: 0
+  baseShieldStrength: 10
+  baseAttackStrength: 10
+  chargeTime: 0

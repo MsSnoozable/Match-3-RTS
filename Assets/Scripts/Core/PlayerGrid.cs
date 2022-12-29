@@ -16,24 +16,39 @@ public partial class PlayerGrid : MonoBehaviour
     [HideInInspector] public const int GridWidth = 8;
     [HideInInspector] public const int GridHeight = 7;
     [HideInInspector] public const int MinColumn = 1;
-    public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
-    //todo: numOfSmallUnits goes to this, but added dynammically?
-    [SerializeField] GameObject[] availableSmallUnits = new GameObject[5];
 
+    public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
+    [SerializeField] GameObject[] availableSmallUnits = new GameObject[5];
+    public bool inCombo = false; //true when stuff is still currently moving. Certain functions dont go until this is true
+
+    //allows pausing moves when too much happens 
+
+    public IEnumerator PauseMove (float delayInSeconds)
+	{
+        pauseMovement = true;
+        yield return new WaitForSeconds(delayInSeconds);
+        pauseMovement = false;
+    }
     #endregion
 
     #region Private Fields
+
+    bool pauseMovement = false;
     bool needsMoveUpdating = false;
-    List<UnitController> toBeMoved = new List<UnitController>();
-    int numOfSmallUnits;
+    [HideInInspector] List<UnitController> toBeMoved = new List<UnitController>();
     //note: maybe needed? //List<UnitController> successfulMatches;
     [HideInInspector] public bool matchMakingComplete = false;
+
     [SerializeField] int MinShieldRequired = 3;
     [SerializeField] int MinAttackRequired = 3;
     float defaultStartingShieldTime = 12f;
-    #endregion
+	
+    int comboCount = 0;
 
-    void Start()
+	#endregion
+
+	#region Main
+	void Start()
 	{
 		InitSpawnUnits();
         
@@ -50,7 +65,6 @@ public partial class PlayerGrid : MonoBehaviour
         GameManager._.OnShieldCreated += StartShieldSequence;
         GameManager._.OnShieldHoldStart += Shield_HoldStart;
         GameManager._.OnShieldFusion += Shield_Fusion;
-
 
         GameManager._.OnDoubleCursorSwap += DoubleCursorSwap;
         GameManager._.OnMoreButtonCursorSwap += MoreButtonsSwap;
@@ -75,7 +89,136 @@ public partial class PlayerGrid : MonoBehaviour
 	{
         Debug.LogWarning("not swapped");
 	}
-    public void ResetBoard(InputAction.CallbackContext context)
+	//todo: toBeChecked of tobechecked but somehow say which directions are valid or not??? like toBeChecked vs toBeChecked only vertically.
+	//essentially trying to store which ones in the check algorithm can skip certain parts
+	void LateUpdate()
+    {
+        if (needsMoveUpdating && !pauseMovement)
+		{
+            List<UnitController> toBeChecked = new List<UnitController>();
+            foreach (UnitController unit in toBeMoved)
+			{
+                if (unit != null)
+                {
+                    unit.Move();
+                    //todo: have more elaborate ways to NOT add to be checked
+                    //for now just have one exception for if in queue
+                    if (unit.xPos != 0)
+                        toBeChecked.Add(unit);
+                }
+			}
+            MatchCheck(toBeChecked);
+            needsMoveUpdating = false;
+            toBeMoved.Clear();
+		}
+    }
+
+	//todo: make this on GM or PG? so matches are handled outside of here
+	//broken: this is comboing an unbelievable amount right now.... maybe design issue not engineering?
+	void MatchCheck(List<UnitController> passedList)
+    {
+        List<UnitController> toBeChecked = new List<UnitController>(passedList);
+
+        int numOfMatches = 0;
+
+        foreach (UnitController checking in toBeChecked)
+        {
+            if (!checking.isIdle) continue;
+            List<UnitController> attackers = new List<UnitController>() { checking };
+            List<UnitController> shielders = new List<UnitController>() { checking };
+
+            #region AddMatchesToList
+            int x = checking.xPos;
+            int y = checking.yPos;
+
+            UnitController movedUnit = GridArray[x, y];
+            if (movedUnit == null) Debug.LogWarning("movedUnit null"); 
+            UnitController nextUnit;
+
+            for (int left = -1; left - MinColumn >= -x; left--)
+            {
+                nextUnit = GridArray[x + left, y];
+                if (nextUnit == null) break;
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
+                else break;
+            }
+            for (int up = -1; up >= -y; up--)
+            {
+                nextUnit = GridArray[x, y + up];
+                if (nextUnit == null) break;
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
+                else break;
+            }
+            for (int right = 1; right <= GridWidth - 1 - x; right++)
+            {
+                nextUnit = GridArray[x + right, y];
+                if (nextUnit == null) break;
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
+                else break;
+            }
+
+            for (int down = 1; down <= GridHeight - 1 - y; down++)
+            {
+                nextUnit = GridArray[x, y + down];
+                if (nextUnit == null) break;
+                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
+                else break;
+            }
+            #endregion
+
+            #region Shield/Attack
+
+			
+            if (shielders.Count >= MinShieldRequired && attackers.Count >= MinAttackRequired)
+			{
+                print("double");
+				UnitController extraUnit = CreateUnit(shielders[0].unitIndex, shielders[0].yPos);
+                extraUnit.Pos = shielders[0].Pos;
+                extraUnit.transform.localPosition = shielders[0].transform.localPosition;
+                shielders[0] = extraUnit; //remove doubled unit from shielders and add extra to shielders
+                //broken: the extraUnit doesn't change how the "move row" works....
+            }
+
+            if (shielders.Count >= MinShieldRequired)
+            {
+                numOfMatches++;
+                UnitShieldInfo info = new UnitShieldInfo(shielders, this);
+                GameManager._.ShieldCreated(info);
+            }
+
+            if (attackers.Count >= MinAttackRequired)
+            {
+                numOfMatches++;
+                UnitAttackInfo info = new UnitAttackInfo(attackers[0].yPos, attackers, this);
+                GameManager._.AttackCreated(info);
+            }
+            #endregion
+        } //for each end
+
+        //if ANY are true. Make in combo true here.
+        inCombo = numOfMatches > 0;
+        if (inCombo)
+		{
+            comboCount++;
+            GameManager._.UpdateComboCount(comboCount);
+		}
+        else
+		{
+            if (comboCount != 0) // if the combo is being reset
+            {
+                GameManager._.FinalizeComboCount(comboCount);
+                comboCount = 0;
+            }
+		}
+        
+
+        /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
+        add delay for each shield/attack fusion and movement animation*/
+    }
+	#endregion
+
+	#region Inputs
+	public void ResetBoard(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -88,6 +231,7 @@ public partial class PlayerGrid : MonoBehaviour
             StartCoroutine(GameManager._.RoundStartCountdown());
 
             DOTween.KillAll();
+            inCombo = false;
             
             foreach(Transform row in rows)
 			{
@@ -97,6 +241,7 @@ public partial class PlayerGrid : MonoBehaviour
 				}
 			}
             InitSpawnUnits();
+
         }
     }
 
@@ -168,6 +313,14 @@ public partial class PlayerGrid : MonoBehaviour
         {
             UnitController unit = this.GridArray[xPos, yPos];
 
+            if (inCombo)
+			{
+                //todo: for now I'm making the swap disabled while comboing. Definitely changing this later
+                Debug.Log("incombo");
+                GameManager._.SwapFailed();
+                return;
+            }
+
 			if (!unit.swappable /*|| !unit.movable*/)
 			{
 				//swap failed
@@ -215,7 +368,10 @@ public partial class PlayerGrid : MonoBehaviour
         }
     }
 
-    public void MoveInGridOnly (UnitController unitToMove, int xDestination, int yDestination)
+	#endregion
+
+	#region Moves
+	public void MoveInGridOnly (UnitController unitToMove, int xDestination, int yDestination)
 	{
         MoveInGridOnly(unitToMove.xPos, unitToMove.yPos, xDestination, yDestination);
 	}
@@ -261,9 +417,24 @@ public partial class PlayerGrid : MonoBehaviour
         if (GridArray[x2, y2] != null)
             GridArray[x2, y2].Pos = new Vector2Int(x2, y2);
 
-        //adds both to list to be moved later
-        toBeMoved.Add(GridArray[x1, y1]);
-        toBeMoved.Add(GridArray[x2, y2]);
+
+        //optimization: I could change the "move to front" and other algorithms to just not allow dupes, but this is easier
+        //also it might be slightly more efficient to have an XPos and a target x for each UC than this check would
+        //just be for if the target and current pos are the same anymore. and the actual pos doesn't update till the move
+        //is completed.
+        if (GridArray[x1, y1] != null && !GridArray[x1, y1].queuedToBeMoved)
+		{
+            toBeMoved.Add(GridArray[x1, y1]);
+            GridArray[x1, y1].queuedToBeMoved = true;
+
+        }
+        //need to learn: how do I rewrite this with null propagation??? the... "?." thing
+        if (GridArray[x2, y2] != null  && !GridArray[x2, y2].queuedToBeMoved)
+		{
+            toBeMoved.Add(GridArray[x2, y2]);
+            GridArray[x2, y2].queuedToBeMoved = true;
+
+        }
 
         needsMoveUpdating = true;
     }
@@ -288,9 +459,27 @@ public partial class PlayerGrid : MonoBehaviour
         }
         else { throw new System.Exception(string.Format("pulledFrom >= destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
     }
+    void MoveToFront (int start_x, int start_y, bool fromShield)
+	{
+        int frontCol = GridWidth - 1;
+        if (!fromShield)
+        {
+            //moves nonshields behind any existing shields
+            var check = Shield_ExistCheck(start_y, -1); //pass in -1 because no shield was made
+            if (check.doesShieldExist)
+                frontCol = check.col - 1;
+        }
 
+        for (int i = frontCol; i > start_x; i--)
+            MoveInGridOnly(start_x, start_y, i, start_y);
+    }
 
-    void AddFromQueue(int row, int distanceFromStart, int destination)
+	#endregion
+
+    //todo: maybe pass in a function so that shield and attack do their hold after they've finished the swap
+    //might be very complex to restructure
+    #region Helper functions
+	void AddFromQueue(int row, int distanceFromStart, int destination)
     {
         int rng = 0;
         do
@@ -373,6 +562,7 @@ public partial class PlayerGrid : MonoBehaviour
             twoAgoChoice_c = lastChoice_c;
         } //end
     }
+    int RandomUnitIndex () => UnityEngine.Random.Range(0, availableSmallUnits.Length);
 
     UnitController CreateUnit (int unitIndex, int row)
 	{
@@ -382,30 +572,6 @@ public partial class PlayerGrid : MonoBehaviour
         uc.unitIndex = unitIndex;  
 
         return uc;
-    }
-
-    //todo: toBeChecked of tobechecked but somehow say which directions are valid or not??? like toBeChecked vs toBeChecked only vertically.
-    //essentially trying to store which ones in the check algorithm can skip certain parts
-    void LateUpdate()
-    {
-        if (needsMoveUpdating)
-		{
-            List<UnitController> toBeChecked = new List<UnitController>();
-            foreach (UnitController unit in toBeMoved)
-			{
-                if (unit != null)
-                {
-                    unit.Move();
-                    //todo: have more elaborate ways to NOT add to be checked
-                    //for now just have one exception for if in queue
-                    if (unit.xPos != 0)
-                        toBeChecked.Add(unit);
-                }
-			}
-            MatchCheck(toBeChecked);
-            needsMoveUpdating = false;
-            toBeMoved.Clear();
-		}
     }
 	private void OnDrawGizmos()
 	{
@@ -418,112 +584,13 @@ public partial class PlayerGrid : MonoBehaviour
                 if (GridArray[i, j] == null)
                 {
                     Vector2 pos = new Vector2(cols[i].transform.position.x, rows[j].transform.position.y);
-                    Gizmos.DrawCube(pos, Vector3.one);
+                    Gizmos.DrawCube(pos, Vector2.one);
                 }
             }
         }
 
 	}
-
-	//calls for each moved unit
-	//todo: make this on GM or PG? so matches are handled outside of here
-	//broken: this is comboing an unbelievable amount right now.... maybe design issue not engineering?
-	void MatchCheck(List<UnitController> passedList)
-    {
-        List<UnitController> toBeChecked = new List<UnitController>(passedList);
-
-        foreach (UnitController checking in toBeChecked)
-        {
-            if (!checking.isIdle) continue;
-            List<UnitController> attackers = new List<UnitController>() { checking };
-            List<UnitController> shielders = new List<UnitController>() { checking };
-
-            #region AddMatchesToList
-            int x = checking.xPos;
-            int y = checking.yPos;
-
-            UnitController movedUnit = GridArray[x, y];
-            if (movedUnit == null) Debug.LogWarning("movedUnit null"); 
-            UnitController nextUnit;
-
-            for (int left = -1; left - MinColumn >= -x; left--)
-            {
-                nextUnit = GridArray[x + left, y];
-                if (nextUnit == null) break;
-                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
-                else break;
-            }
-            for (int up = -1; up >= -y; up--)
-            {
-                nextUnit = GridArray[x, y + up];
-                if (nextUnit == null) break;
-                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
-                else break;
-            }
-            for (int right = 1; right <= GridWidth - 1 - x; right++)
-            {
-                nextUnit = GridArray[x + right, y];
-                if (nextUnit == null) break;
-                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
-                else break;
-            }
-
-            for (int down = 1; down <= GridHeight - 1 - y; down++)
-            {
-                nextUnit = GridArray[x, y + down];
-                if (nextUnit == null) break;
-                if (movedUnit.data == nextUnit.data && nextUnit.isIdle) shielders.Add(nextUnit);
-                else break;
-            }
-            #endregion
-
-            #region Shield/Attack
-            if (shielders.Count >= MinShieldRequired && attackers.Count >= MinAttackRequired)
-			{
-                return;
-                print("double");
-				UnitController extraUnit = CreateUnit(shielders[0].unitIndex, shielders[0].yPos);
-                extraUnit.Pos = shielders[0].Pos;
-                extraUnit.transform.localPosition = shielders[0].transform.localPosition;
-                shielders[0] = extraUnit; //remove doubled unit from shielders and add extra to shielders
-			    //broken: the extraUnit doesn't change how the "move row" works....
-            }
-
-            if (shielders.Count >= MinShieldRequired)
-            {
-                UnitShieldInfo info = new UnitShieldInfo(shielders, this);
-                GameManager._.ShieldCreated(info);
-            }
-
-            if (attackers.Count >= MinAttackRequired)
-            {
-                UnitAttackInfo info = new UnitAttackInfo(attackers[0].yPos, attackers, this);
-                GameManager._.AttackCreated(info);
-            }
-            #endregion
-        } //for each end
-        /*todo: after whole loop foreach ends. move all to total to mostRight/Left/Up/Down? instead.. pg.MoveRow etc.
-        add delay for each shield/attack fusion and movement animation*/
-    }
-    int RandomUnitIndex () => UnityEngine.Random.Range(0, availableSmallUnits.Length);
-    
-    //todo: maybe pass in a function so that shield and attack do their hold after they've finished the swap
-    //might be very complex to restructure
-    void MoveToFront (int start_x, int start_y, bool fromShield)
-	{
-        int frontCol = GridWidth - 1;
-        if (!fromShield)
-        {
-            //moves nonshields behind any existing shields
-            var check = Shield_ExistCheck(start_y, -1); //pass in -1 because no shield was made
-            if (check.doesShieldExist)
-                frontCol = check.col - 1;
-        }
-
-        //actually moves it to front
-        for (int i = frontCol; i > start_x; i--)
-            MoveInGridOnly(start_x, start_y, i, start_y);
-    }
+	#endregion
 
 	#region Shield Creation
 
@@ -539,7 +606,7 @@ public partial class PlayerGrid : MonoBehaviour
         {
             List<UnitController> shielders = new List<UnitController>(info.shielders);
             if (info.fromSwap)
-                yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
+                yield return new WaitForSeconds(GameManager._.unitMoveSpeed); //waits for swap to complete
 
             foreach (UnitController shielder in shielders)
             {
@@ -625,12 +692,14 @@ public partial class PlayerGrid : MonoBehaviour
             }
 
             if (info.fromSwap)
-                yield return new WaitForSeconds(UnitData.moveDuration); //waits for swap to complete
+                yield return new WaitForSeconds(GameManager._.unitMoveSpeed); //waits for swap to complete
             GameManager._.AttackCombine(info);
             //do a unit action?? destroy and move row again
         }
     }
 
+    //broken: if the front unit is removed at the right time then the combine gets interupted before completing
+    //and then a bunch pile up in queue and errors fly out
     void Attack_Combine (UnitAttackInfo info)
 	{
         List<UnitController> attackers = new List<UnitController>(info.attackers);
@@ -638,12 +707,15 @@ public partial class PlayerGrid : MonoBehaviour
         for (int i = 1; i < attackers.Count; i++)
 		{
             attackers[i].swappable = false;
+
+            //todo: maybe move deallocates here???? Not sure if that helps any.
+
             attackers[i].AnimationMove(attackers[0].xPos, attackers[0].yPos, i, (i) =>
 			{
                 if (attackers[i] != null)
                 { 
                     attackers[i].RemoveFromGrid(); //deallocates
-                    Destroy(attackers[i].gameObject);
+                    Destroy(attackers[i].gameObject); //actually destroyed
                 }
                 if (i == attackers.Count - 1)
                 {

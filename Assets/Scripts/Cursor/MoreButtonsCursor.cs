@@ -72,6 +72,7 @@ public class MoreButtonsCursor : CursorScript
 			}
             else
 			{
+                GameManager._.SwapFailed();
                 //swap failed
 			}
         }

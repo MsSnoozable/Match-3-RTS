@@ -18,7 +18,7 @@ public class DoubleCursorScript : CursorScript
 		secondaryCursor = transform.GetChild(0);
 	}
 
-	private void Awake()
+	private new void Awake()
 	{
 		pg = this.GetComponentInParent<PlayerGrid>();
 		transform.position = new Vector2(pg.cols[xPos].position.x, pg.rows[yPos].position.y);
@@ -53,7 +53,7 @@ public class DoubleCursorScript : CursorScript
 					if (yPos == PlayerGrid.GridHeight - 1) Move(Vector2.up);
 					break;
 			}
-			secondaryCursor.DOLocalMove(secondaryCursorMove, moveDuration).SetEase(Ease.OutCirc);
+			secondaryCursor.DOLocalMove(secondaryCursorMove, GameManager._.cursorMoveSpeed).SetEase(Ease.OutCirc);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class DoubleCursorScript : CursorScript
 					if (yPos == PlayerGrid.GridHeight - 1) Move(Vector2.up);
 					break;
 			}
-			secondaryCursor.DOLocalMove(secondaryCursorMove, moveDuration).SetEase(Ease.OutCirc);
+			secondaryCursor.DOLocalMove(secondaryCursorMove, GameManager._.cursorMoveSpeed).SetEase(Ease.OutCirc);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class DoubleCursorScript : CursorScript
 
 		transform.DOMove(new Vector2(
 			pg.cols[xPos].position.x,
-			pg.rows[yPos].position.y), moveDuration).SetEase(Ease.OutCirc);
+			pg.rows[yPos].position.y), GameManager._.cursorMoveSpeed).SetEase(Ease.OutCirc);
 	}
 
 	public override void QuickAttack(InputAction.CallbackContext context)
