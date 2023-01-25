@@ -130,6 +130,7 @@ public class MoreButtonsCursor : CursorScript
             Vector2 swapDirection = context.ReadValue<Vector2>();
 
             Vector2Int intSwapDirection = new Vector2Int((int)swapDirection.x, (int)swapDirection.y);
+            //todo: make a cursor info class
             GameManager._.MoreButtonsCursorSwap(this.tag, xPos, yPos, swapDirection);
         }
     }

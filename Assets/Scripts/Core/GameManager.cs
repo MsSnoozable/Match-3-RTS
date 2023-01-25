@@ -59,8 +59,8 @@ public class GameManager : MonoBehaviour
 	public event Action<UnitShieldInfo> OnShieldHoldStart;
 	public event Action<UnitController> OnShieldRelease;
 
-	public event Action<int> OnUpdateComboCount;
-	public event Action<int> OnFinalizeComboCount;
+	public event Action<int, string> OnUpdateComboCount;
+	public event Action<int, string> OnFinalizeComboCount;
 
 	[HideInInspector] public int numOfHeldShields = 0;
 	[HideInInspector] public int numOfHeldAttacks = 0;
@@ -80,8 +80,8 @@ public class GameManager : MonoBehaviour
 	public void ShieldFusion(UnitShieldInfo shieldInfo) => OnShieldFusion?.Invoke(shieldInfo);
 	public void ShieldRelease(UnitController shield) => OnShieldRelease?.Invoke(shield);
 
-	public void UpdateComboCount(int comboCount) => OnUpdateComboCount?.Invoke(comboCount);
-	public void FinalizeComboCount (int comboCount) => OnFinalizeComboCount?.Invoke(comboCount);
+	public void UpdateComboCount(int comboCount, string tag) => OnUpdateComboCount?.Invoke(comboCount, tag);
+	public void FinalizeComboCount (int comboCount) => OnFinalizeComboCount?.Invoke(comboCount, tag);
 
 	//todo: refactor so no return like a proper setter
 	private GameObject SetCurosrs(cursorOptions cO)

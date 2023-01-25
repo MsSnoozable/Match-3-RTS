@@ -21,23 +21,29 @@ public class ComboUI : MonoBehaviour
 		GameManager._.OnFinalizeComboCount -= FinalizeCombo;
 	}
 
-	void FinalizeCombo (int comboCount)
+	void FinalizeCombo(int comboCount, string playerTag)
 	{
-		switch (comboCount)
+		if (playerTag == this.tag)
 		{
-			case 0:
-				break;
-			default:
-				break;
+			switch (comboCount)
+			{
+				case 0:
+					break;
+				default:
+					break;
+			}
+			StartCoroutine(HideCombo());
 		}
-		StartCoroutine(HideCombo());
 	}
 
-	void DisplayCombo(int comboCount)
+	void DisplayCombo(int comboCount, string playerTag)
 	{
-		StopAllCoroutines();
-		comboCounter.gameObject.SetActive(true);
-		comboCounter.text = "Combo " + comboCount;
+		if (playerTag == this.tag)
+		{
+			StopAllCoroutines();
+			comboCounter.gameObject.SetActive(true);
+			comboCounter.text = "Combo " + comboCount;
+		}
 	}
 
 	IEnumerator HideCombo ()

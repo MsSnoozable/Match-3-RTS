@@ -1,47 +1,48 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class UnitAttackInfo : UnitFormationInfo
 {
 	public int row;
 	public int leftMost;
-	public int rightMost;
+	public int rightMostPosition;
+	public int rightMostIndex;
 	public List<UnitController> attackers;
 
 	public int existingAttackCol;
 
 	public UnitAttackInfo(int row, List<UnitController> attackers, PlayerGrid pg) : base(pg)
 	{
-		int rightMost = PlayerGrid.MinColumn;
-		int leftMost = PlayerGrid.GridWidth - 1;
-
-		foreach (UnitController uc in attackers)
-		{
-			if (uc.xPos < leftMost) leftMost = uc.xPos;
-			if (uc.xPos > rightMost) rightMost = uc.xPos;
-		}
-
-		this.row = row;
-		this.leftMost = leftMost;
-		this.rightMost = rightMost;
-		this.attackers = attackers;
+		GenericConstructor(row, attackers, pg);
 		fromSwap = true;
 	}
 	public UnitAttackInfo(int row, List<UnitController> attackers, PlayerGrid pg, bool fromSwap) : base(pg)
 	{
+		GenericConstructor(row, attackers, pg);
+		this.fromSwap = fromSwap;
+	}
+
+	void GenericConstructor (int row, List<UnitController> attackers, PlayerGrid pg)
+	{
 		int rightMost = PlayerGrid.MinColumn;
 		int leftMost = PlayerGrid.GridWidth - 1;
 
-		foreach (UnitController uc in attackers)
+		int rightMostIndex = 0;
+
+		for (int i = 0; i < attackers.Count; i++)
 		{
-			if (uc.xPos < leftMost) leftMost = uc.xPos;
-			if (uc.xPos > rightMost) rightMost = uc.xPos;
+			if (attackers[i].xPos < leftMost)
+				leftMost = attackers[i].xPos;
+			if (attackers[i].xPos > rightMost)
+			{
+				rightMost = attackers[i].xPos;
+				rightMostIndex = i;
+			}
 		}
 
 		this.row = row;
 		this.leftMost = leftMost;
-		this.rightMost = rightMost;
+		this.rightMostPosition = rightMost;
+		this.rightMostIndex = rightMostIndex;
 		this.attackers = attackers;
-		this.fromSwap = fromSwap;
 	}
 }

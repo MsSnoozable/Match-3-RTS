@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.InputSystem;
-using System;
-using System.Security.Cryptography;
+using UnityEngine.SceneManagement;
 
 //todo: decouple this from all the nonsense so we can assembly def properly
 public partial class PlayerGrid : MonoBehaviour
@@ -23,17 +22,11 @@ public partial class PlayerGrid : MonoBehaviour
 
     //allows pausing moves when too much happens 
 
-    public IEnumerator PauseMove (float delayInSeconds)
-	{
-        pauseMovement = true;
-        yield return new WaitForSeconds(delayInSeconds);
-        pauseMovement = false;
-    }
+
     #endregion
 
     #region Private Fields
 
-    bool pauseMovement = false;
     bool needsMoveUpdating = false;
     [HideInInspector] List<UnitController> toBeMoved = new List<UnitController>();
     //note: maybe needed? //List<UnitController> successfulMatches;
@@ -91,9 +84,9 @@ public partial class PlayerGrid : MonoBehaviour
 	}
 	//todo: toBeChecked of tobechecked but somehow say which directions are valid or not??? like toBeChecked vs toBeChecked only vertically.
 	//essentially trying to store which ones in the check algorithm can skip certain parts
-	void LateUpdate()
+	void Update()
     {
-        if (needsMoveUpdating && !pauseMovement)
+        if (needsMoveUpdating)
 		{
             List<UnitController> toBeChecked = new List<UnitController>();
             foreach (UnitController unit in toBeMoved)
@@ -110,6 +103,16 @@ public partial class PlayerGrid : MonoBehaviour
             MatchCheck(toBeChecked);
             needsMoveUpdating = false;
             toBeMoved.Clear();
+		}
+
+        if (bufferQueued)
+		{
+            if (GridArray[bufferXPos, bufferYPos].swappable &&
+                GridArray[bufferX2Pos, bufferY2Pos].swappable)
+			{
+                MoveInGridOnly(bufferXPos, bufferYPos, bufferX2Pos, bufferY2Pos);
+                bufferQueued = false;
+			}
 		}
     }
 
@@ -156,7 +159,6 @@ public partial class PlayerGrid : MonoBehaviour
                 if (movedUnit.data == nextUnit.data && nextUnit.isIdle) attackers.Add(nextUnit);
                 else break;
             }
-
             for (int down = 1; down <= GridHeight - 1 - y; down++)
             {
                 nextUnit = GridArray[x, y + down];
@@ -169,16 +171,15 @@ public partial class PlayerGrid : MonoBehaviour
             #region Shield/Attack
 
 			
+
             if (shielders.Count >= MinShieldRequired && attackers.Count >= MinAttackRequired)
 			{
-                print("double");
 				UnitController extraUnit = CreateUnit(shielders[0].unitIndex, shielders[0].yPos);
-                extraUnit.Pos = shielders[0].Pos;
+                extraUnit.Pos = shielders[0].Pos; //THIS IS THE PROBLEM. GRID ISN'T UPDATED WITH THIS PROPERLY
                 extraUnit.transform.localPosition = shielders[0].transform.localPosition;
                 shielders[0] = extraUnit; //remove doubled unit from shielders and add extra to shielders
                 //broken: the extraUnit doesn't change how the "move row" works....
             }
-
             if (shielders.Count >= MinShieldRequired)
             {
                 numOfMatches++;
@@ -200,7 +201,7 @@ public partial class PlayerGrid : MonoBehaviour
         if (inCombo)
 		{
             comboCount++;
-            GameManager._.UpdateComboCount(comboCount);
+            GameManager._.UpdateComboCount(comboCount, this.tag);
 		}
         else
 		{
@@ -222,28 +223,18 @@ public partial class PlayerGrid : MonoBehaviour
     {
         if (context.performed)
         {
-            foreach (UnitController uc in GridArray)
-            {
-                if (uc != null)
-                    Destroy(uc.gameObject);
-            }
-            GameManager._.isSetupComplete = false;
-            StartCoroutine(GameManager._.RoundStartCountdown());
-
             DOTween.KillAll();
-            inCombo = false;
-            
-            foreach(Transform row in rows)
-			{
-                foreach (UnitController unit in row.gameObject.GetComponentsInChildren<UnitController>())
-				{
-                    Destroy(unit.gameObject);
-				}
-			}
-            InitSpawnUnits();
-
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
+
+    public void TesterFunction(InputAction.CallbackContext context)
+	{
+        if (context.performed)
+		{
+            MoveToFront(2, 3, false);
+		}
+	}
 
     public void GridArrayChecker(InputAction.CallbackContext context)
 	{
@@ -273,6 +264,7 @@ public partial class PlayerGrid : MonoBehaviour
 				}
             }
             print(output);
+
 		}
 	}
 
@@ -307,63 +299,53 @@ public partial class PlayerGrid : MonoBehaviour
             }
         }
     }
+
+    int bufferXPos;
+    int bufferYPos;
+    int bufferX2Pos;
+    int bufferY2Pos;
+    bool bufferQueued;
+
     public void MoreButtonsSwap (string playerTag, int xPos, int yPos, Vector2 swapDirection)
 	{
         if (playerTag == this.tag)
         {
             UnitController unit = this.GridArray[xPos, yPos];
 
-            if (inCombo)
+            //OOB swap failed
+			if ((swapDirection == Vector2.down && yPos >= GridHeight - 1) ||
+                (swapDirection == Vector2.right && xPos >= GridWidth - 1) ||
+                (swapDirection == Vector2.up && yPos <= 0) ||
+                (swapDirection == Vector2.left && xPos <= MinColumn))
 			{
-                //todo: for now I'm making the swap disabled while comboing. Definitely changing this later
-                Debug.Log("incombo");
                 GameManager._.SwapFailed();
                 return;
             }
 
-			if (!unit.swappable /*|| !unit.movable*/)
-			{
-				//swap failed
-				//fire event
-				//todo: event for can't swap eh eh sound and such
-				GameManager._.SwapFailed();
-                return;
-			}
-            
-            int x2,y2;
-			if (swapDirection == Vector2.down && yPos < GridHeight - 1)
-            {
-                x2 = xPos;
-                y2 = yPos + 1;
-            }
-            else if (swapDirection == Vector2.right && xPos < GridWidth - 1)
-            {
-                x2 = xPos + 1;
-                y2 = yPos;
-            }
-            else if (swapDirection == Vector2.up && yPos > 0)
-            {
-                x2 = xPos;
-                y2 = yPos - 1;
-            }
-            else if (swapDirection == Vector2.left && xPos > MinColumn)
-            {
-                x2 = xPos - 1;
-                y2 = yPos;
-            }
-            else
-            {
-                GameManager._.SwapFailed();
-                return; 
-                // doesn't run if OOB
-            }
+            //optimization: I could configure x2, y2 from the cursor side and just pass those in directly instead
+            int x2 = xPos + (int)swapDirection.x;
+            int y2 = yPos - (int)swapDirection.y;
+
             UnitController secondaryUnit = GridArray[x2, y2];
-            if (!secondaryUnit.swappable /*|| !secondaryUnit.movable*/)
-			{
+
+            if (unit.locked || secondaryUnit.locked)
+            {
+                //todo: event for can't swap eh eh sound and such
                 GameManager._.SwapFailed();
                 return;
-                // doesn't run if OOB
             }
+
+            if (!(secondaryUnit.swappable && unit.swappable)/*|| !secondaryUnit.movable*//*|| !unit.movable*/)
+            {
+                bufferXPos = xPos;
+                bufferYPos = yPos;
+                bufferX2Pos = x2;
+                bufferY2Pos = y2;
+                bufferQueued = true;
+                return;
+            }
+
+            
             MoveInGridOnly(xPos, yPos, x2, y2);
         }
     }
@@ -438,7 +420,12 @@ public partial class PlayerGrid : MonoBehaviour
 
         needsMoveUpdating = true;
     }
-    public void MoveRow(int row, int pulledFrom, int destination)
+
+    public void MoveRow (int row, int pulledFrom, int destination)
+	{
+        MoveRow(row, pulledFrom, destination, false);
+    }
+    void MoveRow(int row, int pulledFrom, int destination, bool fromAttackCombine)
 	{
         if (pulledFrom < destination) //pull from left/queue
         {
@@ -450,11 +437,24 @@ public partial class PlayerGrid : MonoBehaviour
 
                 if (currentlyPulling < 0) //from queue 
 				{
-                    AddFromQueue(row, currentlyPulling, currentDestination);
+                    AddToGridFromOffScreen(row, currentlyPulling, currentDestination, fromAttackCombine);
                     continue;
 				}
-                MoveInGridOnly(currentlyPulling, currentDestination, row);
-                //todo: more specific with which get checked in matches
+
+                if (fromAttackCombine)
+				{
+                    //optimization: could be slightly better if encapsulated in the Move func of UC
+                    UnitController movingUnit = GridArray[currentlyPulling, row];
+                    movingUnit.AnimationMove(currentDestination, row);
+                    movingUnit.Pos = new Vector2Int(currentDestination, row);
+                    GridArray[currentDestination, row] = movingUnit;
+				}
+                else
+				{
+                    //todo: more specific with which get checked in matches
+                    MoveInGridOnly(currentlyPulling, currentDestination, row);
+				}
+
             }
         }
         else { throw new System.Exception(string.Format("pulledFrom >= destination... ????!!! pF: {0}, dest: {1}", pulledFrom, destination)); }
@@ -479,45 +479,50 @@ public partial class PlayerGrid : MonoBehaviour
     //todo: maybe pass in a function so that shield and attack do their hold after they've finished the swap
     //might be very complex to restructure
     #region Helper functions
-	void AddFromQueue(int row, int distanceFromStart, int destination)
+	void AddToGridFromOffScreen(int row, int distanceFromStart, int destination, bool fromAttackCombine)
     {
         int rng = 0;
         do
         {
             rng = RandomUnitIndex();
-        } while (AdjacentMatches(row, rng));
+        } while (OffScreenMatchNegation(row, destination, rng));
 
         UnitController uc = CreateUnit(rng, row);
         GridArray[destination, row] = uc;
-        uc.AnimationMove(destination, row);
+        uc.Pos = new Vector2Int(destination, row);
         uc.transform.localPosition = new Vector2(distanceFromStart + 1, 0);
+
+        if (fromAttackCombine)
+            uc.AnimationMove(destination, row);
+        else
+            toBeMoved.Add(uc);
     }
 
     //qa check: don'_ know if this works properly right now. Might be messed up from the artifacting glitch
-    bool AdjacentMatches (int row, int attemptedIndex)
+    bool OffScreenMatchNegation (int row, int destination, int attemptedIndex)
 	{
-        int topRow = Mathf.Clamp(row - 2, 0, GridHeight - 1);
-        int bottomRow = Mathf.Clamp(row + 2, 0, GridHeight - 1);
+        int topRow = Mathf.Clamp(row - (MinShieldRequired - 1), 0, GridHeight - 1);
+        int bottomRow = Mathf.Clamp(row + (MinShieldRequired - 1), 0, GridHeight - 1);
 
         int verticalMatches = 0;
-        for (int i = row; i > topRow; i--) //check top
+        for (int i = row - 1; i > topRow; i--) //check above
         {
-            if (GridArray[0, i] == null) continue;
-            if (GridArray[0, i].data.color.Equals(attemptedIndex))
+            if (GridArray[destination, i] == null) continue;
+            if (GridArray[destination, i].data.color.Equals(attemptedIndex))
                 verticalMatches++; 
 		}
 
-        for (int i = row; i < bottomRow; i++) //check down
+        for (int i = row + 1; i < bottomRow; i++) //check below
         {
-            if (GridArray[0, i] == null) continue;
-            if (GridArray[0, i].data.color.Equals(attemptedIndex))
+            if (GridArray[destination, i] == null) continue;
+            if (GridArray[destination, i].data.color.Equals(attemptedIndex))
                 verticalMatches++; 
         }
 
         if (verticalMatches >= MinShieldRequired) return true;
 
         int rightMatches = 0;
-        for (int i = 0; i < 2; i++) //check right
+        for (int i = destination; i < MinAttackRequired; i++) //check right
         {
             if (GridArray[i, row] == null) continue;
             if (GridArray[i, row].data.color.Equals(attemptedIndex))
@@ -596,8 +601,13 @@ public partial class PlayerGrid : MonoBehaviour
 
     public void StartShieldSequence (UnitShieldInfo info)
 	{
-        StartCoroutine(ShieldSequence(info));
+        if (info.pg == this)
+        {
+            StartCoroutine(ShieldSequence(info));
+        }
 	}
+
+    float pauseTime = 1f;
 
 	//todo: move to unit actions and do dependcy magic 
 	IEnumerator ShieldSequence(UnitShieldInfo info)
@@ -628,57 +638,61 @@ public partial class PlayerGrid : MonoBehaviour
         }
     }
 
-    void Shield_Fusion (UnitShieldInfo info)
-	{
-        int col = info.existingShieldCol;
-        UnitController shielder = info.currentShield;
-        shielder.isShield = true;
+    void Shield_Fusion(UnitShieldInfo info)
+    {
+        if (info.pg == this) { 
+            int col = info.existingShieldCol;
+            UnitController shielder = info.currentShield;
+            shielder.isShield = true;
 
 
-        shielder.AnimationMove(col, shielder.yPos, () =>
-        {
-            GridArray[col, shielder.yPos].remainingShieldTime -= defaultStartingShieldTime;
-            //"shield fuse event"
+            shielder.AnimationMove(col, shielder.yPos, () =>
+            {
+                GridArray[col, shielder.yPos].remainingShieldTime -= defaultStartingShieldTime;
+                //"shield fuse event"
 
-            Destroy(shielder.gameObject);
+                Destroy(shielder.gameObject);
 
-        });
-        shielder.RemoveFromGrid();
-        MoveRow(shielder.yPos, shielder.xPos - 1, shielder.xPos); //move remaining in
+            });
+            shielder.RemoveFromGrid();
+            MoveRow(shielder.yPos, shielder.xPos - 1, shielder.xPos); //move remaining in
+        }
     }
 
     void Shield_HoldStart (UnitShieldInfo info)
     {
-        UnitController shielder = info.currentShield;
+        if (info.pg == this)
+        {
+            UnitController shielder = info.currentShield;
 
-        MoveToFront(shielder.xPos, shielder.yPos, true);
-        //todo: make the event call as a callback after movetoFront. Don't know setup for it yet
-        shielder.remainingShieldTime = defaultStartingShieldTime;
+            MoveToFront(shielder.xPos, shielder.yPos, true);
+            //todo: make the event call as a callback after movetoFront. Don't know setup for it yet
+            shielder.remainingShieldTime = defaultStartingShieldTime;
 
-        shielder.isShield = true;
+            shielder.isShield = true;
+        }
     }
 
     (bool doesShieldExist, int col) Shield_ExistCheck(int row, int addedShieldCol)
     {
-        //print("col:" + addedShieldCol);
         for (int i = GridWidth - 1; i >= MinColumn; i--)
         {
             UnitController checking = GridArray[i, row];
             if (checking == null) continue;
-            //print(string.Format("_:{0}, isShield:{1}", _, checking.isShield));
             if (checking.isShield && i != addedShieldCol)
-            {
                 return (true, i);
-            }
         }
         return (false, 0);
     }
-	#endregion
+    #endregion
 
 	#region Attack Creation
 	public void StartAttackSequence(UnitAttackInfo info)
     {
-        StartCoroutine(AttackSequence(info));
+        if (info.pg.tag == this.tag)
+        {
+            StartCoroutine(AttackSequence(info));
+        }
     }
 
     IEnumerator AttackSequence(UnitAttackInfo info)
@@ -688,7 +702,7 @@ public partial class PlayerGrid : MonoBehaviour
             List<UnitController> attackers = new List<UnitController>(info.attackers);
             foreach (UnitController attacker in attackers)
             {
-                attacker.swappable = false;
+                attacker.locked = true;
             }
 
             if (info.fromSwap)
@@ -702,65 +716,71 @@ public partial class PlayerGrid : MonoBehaviour
     //and then a bunch pile up in queue and errors fly out
     void Attack_Combine (UnitAttackInfo info)
 	{
-        List<UnitController> attackers = new List<UnitController>(info.attackers);
+        if (info.pg == this)
+        {
+            List<UnitController> attackers = new List<UnitController>(info.attackers);
 
-        for (int i = 1; i < attackers.Count; i++)
-		{
-            attackers[i].swappable = false;
+            for (int i = 0; i < attackers.Count; i++)
+            {
+                attackers[i].locked = true;
 
-            //todo: maybe move deallocates here???? Not sure if that helps any.
-
-            attackers[i].AnimationMove(attackers[0].xPos, attackers[0].yPos, i, (i) =>
-			{
-                if (attackers[i] != null)
-                { 
-                    attackers[i].RemoveFromGrid(); //deallocates
-                    Destroy(attackers[i].gameObject); //actually destroyed
-                }
-                if (i == attackers.Count - 1)
+                //optimization: maybe move deallocates here???? Not sure if that helps any.
+                attackers[i].AnimationMove(attackers[info.rightMostIndex].xPos, attackers[info.rightMostIndex].yPos, i, (i) =>
                 {
-                    var (doesAttackExist, col) = Attack_ExistCheck(info.row, info.attackers[0].xPos, info.attackers[0].data);
-                    info.existingAttackCol = col;
-                    if (doesAttackExist) //fuse attack
+                    if (attackers[i] != null && i != info.rightMostIndex)
                     {
-                        GameManager._.AttackFuse(info);
+                        //attackers[i].RemoveFromGrid(); //deallocates
+                        Destroy(attackers[i].gameObject); //actually destroyed
                     }
-                    else //new attack
+                    if (i == info.rightMostIndex)
                     {
-                        GameManager._.AttackHoldStart(info);
+                        var (doesAttackExist, col) = Attack_ExistCheck(info.row, info.attackers[0].xPos, info.attackers[0].data);
+                        info.existingAttackCol = col;
+
+                        if (doesAttackExist) //fuse attack
+                        {
+                            GameManager._.AttackFuse(info);
+                        }
+                        else //new attack
+                        {
+                            GameManager._.AttackHoldStart(info);
+                        }
                     }
-                }
-            });
-		} //for end
+                });
+            } //for end
+            MoveRow(info.row, info.leftMost - 1, info.rightMostPosition - 1, true); //move left in 2
+        }
     }  
 
     //fuse to existing attack and move grid accordingly
     void Attack_Fusion (UnitAttackInfo info) 
 	{
-        UnitController addedAttack = info.attackers[0];
-        int col = info.existingAttackCol;
-
-        addedAttack.AnimationMove(col, addedAttack.yPos, () =>
+        if (info.pg == this)
         {
-            addedAttack.isAttack = true;
-            Destroy(addedAttack.gameObject);
-        });
-        addedAttack.RemoveFromGrid();
-        MoveRow(info.row, info.leftMost - 1, info.rightMost); //move left in 3
-        
+            UnitController addedAttack = info.attackers[0];
+            int col = info.existingAttackCol;
+
+            addedAttack.AnimationMove(col, addedAttack.yPos, () =>
+            {
+                addedAttack.isAttack = true;
+                Destroy(addedAttack.gameObject);
+            });
+            addedAttack.RemoveFromGrid();
+            MoveRow(info.row, info.leftMost - 1, info.rightMostPosition); //move left in 3
+        }
         //todo: add my attack value to existing attack
     }
 
     void Attack_HoldStart (UnitAttackInfo info)
 	{
-        UnitController addedAttack = info.attackers[0];
-
-        MoveToFront(addedAttack.xPos, addedAttack.yPos, false);
-        MoveRow(info.row, info.leftMost - 1, info.rightMost - 1); //move left in 2
-
-        addedAttack.isAttack = true;
+        if (info.pg == this)
+        {
+            UnitController addedAttack = info.attackers[info.rightMostIndex];
+            MoveToFront(addedAttack.xPos, addedAttack.yPos, false);
+            addedAttack.isAttack = true;
+        }
     }
-
+    
     (bool doesAttackExist, int col) Attack_ExistCheck (int row, int addedAttackCol, UnitData data)
 	{
         for (int i = GridWidth - 1; i >= MinColumn; i--)

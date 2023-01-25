@@ -13,6 +13,8 @@ public class UnitController : MonoBehaviour
     public int unitIndex; //note: might need later for more optimized randomization.
     int unitStrength;
 
+    [SerializeField] GameObject GraveStone; //optimization: might be better to have in PG?
+
     [HideInInspector] public bool isIdle
     {
         get { return _isIdle; }
@@ -35,11 +37,13 @@ public class UnitController : MonoBehaviour
             _isAttack = value;
             _isShield = !value;
             swappable = !value;
+            locked = value;
             anim.SetBool("isIdle", !value);
             anim.SetBool("isAttack", value);
             anim.SetBool("isShield", !value);
-            unitStrength = data.baseAttackStrength;
+            unitStrength = data.baseAttackHoldStrength;
 
+            //todo: set strength differently based on combo count
         }
     }
     [HideInInspector] public bool isShield
@@ -51,6 +55,7 @@ public class UnitController : MonoBehaviour
             _isAttack = !value;
             _isShield = value;
 			swappable = !value;
+            locked = value;
 
             unitStrength = data.baseShieldStrength;
 
@@ -89,6 +94,7 @@ public class UnitController : MonoBehaviour
 	}
 
     [HideInInspector] public bool swappable;
+    [HideInInspector] public bool locked;
     [HideInInspector] public bool movable;
 
     public float remainingShieldTime
@@ -125,15 +131,9 @@ public class UnitController : MonoBehaviour
         swappable = true;
         movable = true;
         isIdle = true;
+        locked = false;
 
     }
-
-    private unitColors _color;
-
-    void LoadData ()
-	{
-        
-	}
 
     public void Summon(int xDestination, int yDestination)
     {
@@ -233,7 +233,6 @@ public class UnitController : MonoBehaviour
     {
         if (pg.GridArray[xPos, yPos] != null)
         {
-            pg.StartCoroutine(pg.PauseMove(0.2f));
             this.RemoveFromGrid();
             pg.MoveRow(yPos, xPos - 1, xPos);
             DOTween.Kill(this.transform);
@@ -282,10 +281,7 @@ public class UnitController : MonoBehaviour
 
         if (hitGO.CompareTag("Attack"))
 		{
-
-            //takes damage... for now just dies
-            //attack vs unit unitStrength 
-
+            //optimization: can cache the reference to this component somewhere to make it faster to access
             int enemyAttackStrength = hitGO.GetComponent<AttackTravel>().attackStrength;
             if (unitStrength >= enemyAttackStrength)
             {
@@ -295,11 +291,30 @@ public class UnitController : MonoBehaviour
 			else
             {
                 enemyAttackStrength -= unitStrength;
-                DeleteUnit();
+                Die();
             }
 		}
 	}
+
+    void Die ()
+    {
+        //todo: might need to change because this assumes only graves are void colored
+        if (data.color == unitColors.Void)
+		{
+            DeleteUnit();
+		}
+        else
+		{
+            //replace with grave stone
+            GameObject grave = Instantiate(GraveStone);
+            grave.transform.position = this.transform.position;
+            UnitController uc = grave.GetComponent<UnitController>();
+			pg.GridArray[xPos, yPos] = uc;
+            Destroy(this.gameObject);
+		}
+    }
 }
+
 
 [Serializable]
 public class example
