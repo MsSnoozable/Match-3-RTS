@@ -100,6 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   travelSpeed: 0.2
+  attackStrength: 22
 --- !u!70 &7264801840530750702
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

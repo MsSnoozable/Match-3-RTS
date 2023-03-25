@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
 	public float cursorMoveSpeed;
 	public float unitMoveSpeed;
 
+	public bool P1AttackExists;
+
 	private void Start()
 	{
 		isSetupComplete = false;

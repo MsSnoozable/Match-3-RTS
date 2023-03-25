@@ -3,7 +3,12 @@ guid: f2d78e83e7de18141b37dfaa2de5bd9c
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - P1: {instanceID: 0}
+  - P2: {instanceID: 0}
+  - doubleCursor: {instanceID: 0}
+  - singleCursor: {instanceID: 0}
+  - moreButtonsCursor: {fileID: 5083479231287175106, guid: 2ec003ca8c2fc8c48a91497afe662264, type: 3}
   executionOrder: -20
   icon: {instanceID: 0}
   userData: 

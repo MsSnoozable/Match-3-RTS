@@ -354,7 +354,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51790d69c1d2bac47bc433c0349846d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDuration: 0.15
   playerInput: {fileID: 0}
   pg: {fileID: 0}
   leftAddon: {fileID: 4192164833820111445}

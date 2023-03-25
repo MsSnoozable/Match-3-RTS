@@ -132,7 +132,7 @@ public class UnitController : MonoBehaviour
         movable = true;
         isIdle = true;
         locked = false;
-
+        unitStrength = data.idleStrength;
     }
 
     public void Summon(int xDestination, int yDestination)
@@ -179,13 +179,11 @@ public class UnitController : MonoBehaviour
     {
         anim.SetBool("isMove", true);
 
-        //broken: switching this on and off is still kind of broken. Like it doesn't let you buffer moves
         swappable = false;
 
         float xTarget = pg.cols[xDestination].position.x;
         float yTarget = pg.rows[yDestination].position.y;
 
-        //print(string.Format("x: {0}, y: {1}", xPos, yPos));
         Vector2 Destination = new Vector2(xTarget, yTarget);
         float xflip = this.transform.localScale.x;
 
@@ -246,13 +244,20 @@ public class UnitController : MonoBehaviour
         Attack, Shield
 	}
     public GameObject attackObject;
-    //need to learn: what is this exactly?
-    public void Release(ActionType at)
+    //currently called from animation event
+    //todo: make animation loop until specified time of that SO charge time
+    public void Attack_Release(ActionType at)
     {
         if (at == ActionType.Attack)
 		{
             GameObject aO = Instantiate(attackObject);
             aO.transform.position = this.transform.position;
+
+            AttackTravel travelScript = aO.GetComponent<AttackTravel>();
+
+            //flips travel direction if player2
+            if (pg.CompareTag("Player 2")) travelScript.travelSpeed *= -1; 
+            
             //todo: attackObjectInfo constructor to determine attack unitStrength
             //for now just add a default value
             
@@ -267,9 +272,29 @@ public class UnitController : MonoBehaviour
         DeleteUnit();
 	}
 
-    //optimization: seems messy to have two versions of very similar functions... maybe consolidate
+    //the thing is reeady to release attack/ but grid isn't ready
+	void PreRelease ()
+	{
 
-    public void RemoveFromGrid() => pg.GridArray[xPos, yPos] = null;
+
+	}
+
+
+    IEnumerator idk ()
+	{
+        while (true)
+		{
+            yield return null;
+            if (pg.isNeutral)
+			{
+                Attack_Release(ActionType.Attack);
+			}
+		}
+	}
+
+	//optimization: seems messy to have two versions of very similar functions... maybe consolidate
+
+	public void RemoveFromGrid() => pg.GridArray[xPos, yPos] = null;
 
     void UpdateStrength ()
 	{
@@ -281,8 +306,12 @@ public class UnitController : MonoBehaviour
 
         if (hitGO.CompareTag("Attack"))
 		{
+
+            AttackTravel aT = hitGO.GetComponent<AttackTravel>();
             //optimization: can cache the reference to this component somewhere to make it faster to access
-            int enemyAttackStrength = hitGO.GetComponent<AttackTravel>().attackStrength;
+            int enemyAttackStrength = aT.attackStrength;
+
+            print("projec " + enemyAttackStrength + ", unit " + unitStrength);
             if (unitStrength >= enemyAttackStrength)
             {
                 unitStrength -= enemyAttackStrength;
@@ -290,7 +319,7 @@ public class UnitController : MonoBehaviour
 			}
 			else
             {
-                enemyAttackStrength -= unitStrength;
+                aT.attackStrength -= unitStrength;
                 Die();
             }
 		}
@@ -298,7 +327,7 @@ public class UnitController : MonoBehaviour
 
     void Die ()
     {
-        //todo: might need to change because this assumes only graves are void colored
+        /*//todo: might need to change because this assumes only graves are void colored
         if (data.color == unitColors.Void)
 		{
             DeleteUnit();
@@ -310,9 +339,19 @@ public class UnitController : MonoBehaviour
             grave.transform.position = this.transform.position;
             UnitController uc = grave.GetComponent<UnitController>();
 			pg.GridArray[xPos, yPos] = uc;
+            uc.pg = this.pg;
+            uc.Pos = new Vector2Int(xPos, yPos);
+            uc.StartCoroutine(uc.delayedActivate());
             Destroy(this.gameObject);
-		}
+		}*/
+        DeleteUnit();
     }
+
+/*
+    IEnumerator delayedActivate ()
+	{
+        yield return null;
+	}*/
 }
 
 

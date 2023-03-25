@@ -7,9 +7,11 @@ using TMPro;
 public class ComboUI : MonoBehaviour
 {
 	public TextMeshProUGUI comboCounter;
+	public TextMeshProUGUI comboFinalizerText;
 
-    // Start is called before the first frame update
-    void Start()
+
+	// Start is called before the first frame update
+	void Start()
     {
 		GameManager._.OnUpdateComboCount += DisplayCombo;
 		GameManager._.OnFinalizeComboCount += FinalizeCombo;
@@ -27,9 +29,20 @@ public class ComboUI : MonoBehaviour
 		{
 			switch (comboCount)
 			{
-				case 0:
+				case 1:
+					comboFinalizerText.text = "Weak!";
+					break;
+				case 2:
+					comboFinalizerText.text = "double!";
+					break;
+				case 3:
+					comboFinalizerText.text = "triple!";
+					break;
+				case 4:
+					comboFinalizerText.text = "Impressive!";
 					break;
 				default:
+					comboFinalizerText.text = "Ultraaaaaa!";
 					break;
 			}
 			StartCoroutine(HideCombo());
@@ -51,5 +64,6 @@ public class ComboUI : MonoBehaviour
 		//Hide combo
 		yield return new WaitForSeconds(3f);
 		comboCounter.gameObject.SetActive(false);
+		comboFinalizerText.gameObject.SetActive(false);
 	}
 }

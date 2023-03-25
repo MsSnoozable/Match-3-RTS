@@ -16,12 +16,10 @@ public partial class PlayerGrid : MonoBehaviour
     [HideInInspector] public const int GridHeight = 7;
     [HideInInspector] public const int MinColumn = 1;
 
+    [HideInInspector] public bool matchMakingComplete = false;
     public UnitController[,] GridArray = new UnitController[GridWidth, GridHeight];
     [SerializeField] GameObject[] availableSmallUnits = new GameObject[5];
     public bool inCombo = false; //true when stuff is still currently moving. Certain functions dont go until this is true
-
-    //allows pausing moves when too much happens 
-
 
     #endregion
 
@@ -29,15 +27,14 @@ public partial class PlayerGrid : MonoBehaviour
 
     bool needsMoveUpdating = false;
     [HideInInspector] List<UnitController> toBeMoved = new List<UnitController>();
-    //note: maybe needed? //List<UnitController> successfulMatches;
-    [HideInInspector] public bool matchMakingComplete = false;
 
     [SerializeField] int MinShieldRequired = 3;
     [SerializeField] int MinAttackRequired = 3;
     float defaultStartingShieldTime = 12f;
 	
     int comboCount = 0;
-
+    //A grid is considered neutral if nothing is moving at the time
+    public bool isNeutral = true;
 	#endregion
 
 	#region Main
@@ -300,6 +297,7 @@ public partial class PlayerGrid : MonoBehaviour
         }
     }
 
+    //allows for buffering the next swap
     int bufferXPos;
     int bufferYPos;
     int bufferX2Pos;
@@ -745,12 +743,19 @@ public partial class PlayerGrid : MonoBehaviour
                         {
                             GameManager._.AttackHoldStart(info);
                         }
+
                     }
                 });
             } //for end
             MoveRow(info.row, info.leftMost - 1, info.rightMostPosition - 1, true); //move left in 2
         }
     }  
+
+    IEnumerator Attack_Release (UnitAttackInfo info)
+	{
+        float time = 5f;
+        yield return new WaitForSeconds(time);
+	}
 
     //fuse to existing attack and move grid accordingly
     void Attack_Fusion (UnitAttackInfo info) 
@@ -778,6 +783,8 @@ public partial class PlayerGrid : MonoBehaviour
             UnitController addedAttack = info.attackers[info.rightMostIndex];
             MoveToFront(addedAttack.xPos, addedAttack.yPos, false);
             addedAttack.isAttack = true;
+
+            StartCoroutine(Attack_Release(info));
         }
     }
     

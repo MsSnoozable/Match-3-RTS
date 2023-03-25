@@ -18,6 +18,8 @@ public abstract class UnitData : ScriptableObject
 	public int baseAttackReleaseStrength;
 	[Tooltip ("seconds from attack formation being made to the attack launching")]
 	public float chargeTime;
+	[Tooltip("Strength of units not in a formation")]
+	public int idleStrength;
 	#endregion
 
 	#region Private Fields

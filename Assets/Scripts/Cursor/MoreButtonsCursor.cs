@@ -14,6 +14,7 @@ public class MoreButtonsCursor : CursorScript
     {
         base.Move(moveDirection);
 
+
         if (xPos == PlayerGrid.MinColumn) leftAddon.SetActive(false);
         else leftAddon.SetActive(true);
 

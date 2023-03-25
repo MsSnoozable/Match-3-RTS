@@ -21,9 +21,8 @@ public class AttackTravel : MonoBehaviour
 
 		Destroy(this.gameObject);
 	}
-	// Update is called once per frame
 	void Update()
     {
-        transform.Translate(Vector2.up * travelSpeed);
+        transform.Translate(Vector3.up * travelSpeed);
     }
 }

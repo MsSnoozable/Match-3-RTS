@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5648b3160a249cb4a9b2941aa5b52e66, type: 3}
   m_Name: Red
   m_EditorClassIdentifier: 
-  model: {fileID: 0}
   color: 0
   type: 0
   range: 0
   baseShieldStrength: 10
-  baseAttackStrength: 10
+  baseAttackHoldStrength: 0
+  baseAttackReleaseStrength: 0
   chargeTime: 0
+  idleStrength: 4

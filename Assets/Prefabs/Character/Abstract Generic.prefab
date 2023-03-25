@@ -71,9 +71,11 @@ MonoBehaviour:
   justMoved: 0
   pg: {fileID: 0}
   unitIndex: 0
+  GraveStone: {fileID: 321450757877539417, guid: 0cde07667a5d41a46b664c4cfa37fa00, type: 3}
   xPos: 0
   yPos: 0
   swappable: 0
+  locked: 0
   movable: 0
   queuedToBeMoved: 0
   ex:
